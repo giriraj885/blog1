@@ -7,8 +7,8 @@ from rest_framework.parsers import FormParser, JSONParser
 from rest_framework import serializers as rest_serializer
 from rest_framework.serializers import ValidationError 
 from base.views import BaseAPIView, get_response
-from .models import User,BlackList,UserVerification
-from .serializers import UserSignUpSerializer, UserSignInSerializer,UserProfileSerializer,UserPasswordUpdateSerializer,GetUserProfileSerializer,UserRemoveSerializer
+from miniproject_user.models import User,BlackList,UserVerification
+from miniproject_user.serializers import UserSignUpSerializer, UserSignInSerializer,UserProfileSerializer,UserPasswordUpdateSerializer,GetUserProfileSerializer,UserRemoveSerializer
 from base.authentication import CustomAuthentication
 # import logging
 
