@@ -1,0 +1,15 @@
+*.pyc
+.vscode/
+env/
+node_modules/
+
+# dependencies
+static/open-to-close-angular/node_modules
+
+# e2e
+static/open-to-close-angular/e2e/*.js
+static/open-to-close-angular/e2e/*.map
+
+#dist
+
+migrations/
