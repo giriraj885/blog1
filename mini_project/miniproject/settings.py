@@ -25,8 +25,8 @@ SECRET_KEY = '7mnw)sh5u-xe3z04$3&er0(bu+^fm3!%bm6#u-tkdh6o#cvtz+'
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-# ALLOWED_HOSTS = ['159.65.151.99']
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['159.65.151.99']
+# ALLOWED_HOSTS = []
 AUTH_USER_MODEL = 'miniproject_user.User'
 
 
@@ -89,12 +89,12 @@ DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql_psycopg2',
         'NAME': 'test',
-        'USER': 'postgres',
+        'USER': 'postgres1',
         'PASSWORD': '1234',
         'HOST': 'localhost',
         'PORT': '',
     }
- }
+}
 
 AUTHENTICATION_BACKENDS = (
     'allauth.account.auth_backends.AuthenticationBackend',
