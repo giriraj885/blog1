@@ -56,17 +56,22 @@ class User(AbstractBaseUser,BaseModel):
         db_table = 'users'
 
     name = models.CharField(max_length=255)
-    email = models.EmailField(unique=True,max_length=255)
+    email = models.EmailField(max_length=255, default='')
+    username = models.CharField(max_length=255,default='')
+    objects = UserManager()
     business_name = models.CharField(max_length=255)
     business_photo = models.CharField(max_length=255)
     photo = models.CharField(max_length=255,default='')
     about = models.TextField(default='')
     address = models.CharField(max_length=255,default='')
-    phone = models.CharField(max_length=255, default='')
+    phone = models.CharField(max_length=255, unique=True)
     phoneAlt = models.CharField(max_length=255,default='')
     permissions = models.ForeignKey(UserPermission, on_delete=models.CASCADE)
-    USERNAME_FIELD = 'email'
+    USERNAME_FIELD = 'phone'
         
+    def get_user_id(self):
+        return self.id
+
     def get_phone(self):
         return self.phone
         
