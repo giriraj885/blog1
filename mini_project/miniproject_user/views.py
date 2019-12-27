@@ -1,4 +1,5 @@
 from rest_framework.response import Response
+from rest_framework import generics, status
 from rest_framework.permissions import AllowAny
 from rest_framework_jwt.settings import api_settings
 from rest_framework_jwt.authentication import JSONWebTokenAuthentication
@@ -22,7 +23,6 @@ class SignUp(BaseAPIView):
         jwt_payload_handler = api_settings.JWT_PAYLOAD_HANDLER
         jwt_encode_handler = api_settings.JWT_ENCODE_HANDLER
         payload = jwt_payload_handler(user)
-        payload['user_id'] = str(payload['user_id'])
         token = jwt_encode_handler(payload)
         # logging.info('User registered successfully') 
         response = get_response('User registered.',BaseAPIView.PASS_RESPONSE_STATUS, BaseAPIView.SUCCESS_CODE, token)
@@ -32,7 +32,6 @@ class SignIn(BaseAPIView):
     permission_classes = (AllowAny,)
 
     def post(self, request):      
-        print("Signin")
         user_signin_ser = UserSignInSerializer(data=request.data)
         user_signin_ser.is_valid(raise_exception=True)
         validated_data = user_signin_ser.validated_data
@@ -44,15 +43,10 @@ class SignIn(BaseAPIView):
         if not user.check_password(validated_data['password']):
             raise ValidationError('Mobile number or password is incorrect') 
 
-        print(user)
         jwt_payload_handler = api_settings.JWT_PAYLOAD_HANDLER
-        print(jwt_payload_handler)
         jwt_encode_handler = api_settings.JWT_ENCODE_HANDLER
         payload = jwt_payload_handler(user)
-        payload['user_id'] = str(payload['user_id'])
-        print(payload['user_id'])
         token = jwt_encode_handler(payload)
-        print(token)
         response = get_response('Valid user.',BaseAPIView.PASS_RESPONSE_STATUS,BaseAPIView.SUCCESS_CODE,token)
         return Response(response)
     
@@ -66,31 +60,37 @@ class UserProfileUpdate(BaseAPIView):
         return Response(response)
 
     def put(self,request):
-        old_email = request.user.email
+        # old_email = request.user.email
         user_profile_serializer = UserProfileSerializer(request.user, data=request.data)
         user_profile_serializer.is_valid(raise_exception=True)
         validated_data = user_profile_serializer.validated_data
-        validated_data['email'] = validated_data['email'].lower()
-        user_profile_serializer.save()
-        if validated_data['email'] != old_email:
-            jwt_payload_handler = api_settings.JWT_PAYLOAD_HANDLER
-            jwt_encode_handler = api_settings.JWT_ENCODE_HANDLER
-            payload = jwt_payload_handler(request.user)
-            payload['user_id'] = str(payload['user_id'])
-            token = jwt_encode_handler(payload)
-        else: 
-            token = request.META['HTTP_AUTHORIZATION'][4:]
 
-        response = get_response("Profile updated!",BaseAPIView.PASS_RESPONSE_STATUS, BaseAPIView.SUCCESS_CODE,token)
+        if user_profile_serializer.is_valid() == False:
+            response = self.getErrorResponse(user_profile_serializer, status.HTTP_400_BAD_REQUEST)
+            return Response(response, status=response['statusCode'])
+        # validated_data['email'] = validated_data['email'].lower()
+        user_profile_serializer.save()
+        # if validated_data['email'] != old_email:
+        #     jwt_payload_handler = api_settings.JWT_PAYLOAD_HANDLER
+        #     jwt_encode_handler = api_settings.JWT_ENCODE_HANDLER
+        #     payload = jwt_payload_handler(request.user)
+        #     payload['user_id'] = str(payload['user_id'])
+        #     token = jwt_encode_handler(payload)
+        # else: 
+        #     token = request.META['HTTP_AUTHORIZATION'][4:]
+
+        response = get_response("Profile updated!",BaseAPIView.PASS_RESPONSE_STATUS, BaseAPIView.SUCCESS_CODE)
         return Response(response)
 
     def delete(self, request):
         try:
             user_remove_serializer = UserRemoveSerializer(data=request.data)
-            user_remove_serializer.is_valid(raise_exception=True)
+            if user_remove_serializer.is_valid() == False:
+                response = self.getErrorResponse(user_remove_serializer, status.HTTP_400_BAD_REQUEST)
+                return Response(response, status=response['statusCode'])
             validated_data = user_remove_serializer.validated_data
 
-            user = User.objects.get(_id=validated_data['user_id'])
+            user = User.objects.get(id=validated_data['user_id'])
             user.delete()
             response = get_response("User Deleted",BaseAPIView.PASS_RESPONSE_STATUS, BaseAPIView.SUCCESS_CODE,None)
         except User.DoesNotExist:

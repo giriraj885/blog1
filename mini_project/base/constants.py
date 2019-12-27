@@ -1,0 +1,18 @@
+EXCEPTION_RESPONSE_CODE = {
+    "Authentication credentials were not provided." : 401,
+    "Signature has expired." : 401,
+    "Unauthorized user" : 401,
+    "Invalid signature." : 401,
+    "Incorrect authentication credentials."  : 401
+}
+
+EXCEPTION_HANDLER = {
+    "user with this email already exists." : "User already exist with this email",
+    "Unauthorized user" : "Unauthorized user",
+    "Upload a valid image. The file you uploaded was either not an image or a corrupted image." : "Upload a valid image. The file you uploaded was either not an image or a corrupted image.",
+    "Authentication credentials were not provided." : "Authentication failed, please re-login.",
+    "Signature has expired." : "Authentication failed, please re-login.",
+    "Unauthorized user" : "Authentication failed, please re-login.",
+    "Invalid signature." : "Authentication failed, please re-login.",
+    "Incorrect authentication credentials."  : "Authentication failed, please re-login."
+}

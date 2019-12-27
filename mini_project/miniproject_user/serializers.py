@@ -79,9 +79,7 @@ class UserSignUpSerializer(BaseSerializer):
         }
 
     def create(self, validated_data):
-        print('.........')
-        print(validated_data)
-        if User.objects.filter(email=validated_data['mobile_number']).exists():
+        if User.objects.filter(phone=validated_data['mobile_number']).exists():
             raise ValidationError('User is aleary exist with this mobile number.', code="45")
 
         if validated_data['password'] != validated_data['passwordConfirmation']:
@@ -90,8 +88,6 @@ class UserSignUpSerializer(BaseSerializer):
         permissions = UserPermission(
             is_admin = False
         )
-        print('llllllllllllllll')
-        print(permissions)
         permissions.save()
 
         user = User(
@@ -103,8 +99,7 @@ class UserSignUpSerializer(BaseSerializer):
         
         user.save()
 
-        if 'business_photo' in validated_data:
-            print('in if..')
+        if 'business_photo' in validated_data and validated_data['business_photo']:
             user.business_photo = validated_data['business_photo']
             user.save()
 
@@ -112,47 +107,66 @@ class UserSignUpSerializer(BaseSerializer):
 
 
 class UserProfileSerializer(BasePlainSerializer):    
-    mobile_number = miniproject_base_serializer.CharField(required=False,allow_blank=True,default='', error_messages={
-        'invalid' : 'Invalid email',
+    mobile_number = miniproject_base_serializer.IntegerField(required=False,default=0, error_messages={
+        'invalid' : 'Invalid mobile number',
         'invalid_code' : 500
     })
 
-    business_name = miniproject_base_serializer.CharField(required=True, error_messages={
-        'required': 'Please enter your business name',
-        'required_code' : 400,
-        'blank': 'Your business name may not be blank',
-        'blank_code' : 300
+    business_name = miniproject_base_serializer.CharField(required=False, allow_blank=True,default='', error_messages={
+        # 'required': 'Please enter your business name',
+        # 'required_code' : 400,
+        # 'blank': 'Your business name may not be blank',
+        # 'blank_code' : 300
+         'invalid' : 'Invalid business name',
+        'invalid_code' : 500
     })
 
-    photo = miniproject_base_serializer.CharField(required=True, allow_blank=True, error_messages={
-        'required' : 'Please add your photo',
-        'required_code' : 400,
-        'blank': 'Photo may not be blank',
-        'blank_code' : 300
+    business_address = miniproject_base_serializer.CharField(required=False, allow_blank=True,default='', error_messages={
+        # 'required' : 'Please address',
+        # 'required_code' : 400,
+        # 'blank': 'Address may not be blank',
+        # 'blank_code' : 300
+         'invalid' : 'Invalid business address',
+        'invalid_code' : 500
+    })
+
+    name = miniproject_base_serializer.CharField(required=False, allow_blank=True,default='', error_messages={
+        # 'required' : 'Please address',
+        # 'required_code' : 400,
+        # 'blank': 'Address may not be blank',
+        # 'blank_code' : 300
+        'invalid' : 'Invalid business address',
+        'invalid_code' : 500
     })
      
     def update(self, instance, validated_data):
         user = instance
         
-        user_list = User.objects.filter(phone=validated_data['mobile_number']).exclude(phone=user.phone)
-        if len(user_list) != 0:
-            raise ValidationError('User is aleary exist with this mobile number.', code=450)
+        if 'mobile_number' in validated_data and validated_data['mobile_number']:
+            user_list = User.objects.filter(phone=validated_data['mobile_number']).exclude(phone=user.phone)
+            if len(user_list) != 0:
+                raise ValidationError('User is aleary exist with this mobile number.', code=450)
+            user.phone = validated_data['mobile_number']
             
-        user.business_name = validated_data['business_name']
-        user.photo = validated_data['photo']
-        user.phone = validated_data['mobile_number']
+        if 'business_name' in validated_data and validated_data['business_name']:
+            user.business_name = validated_data['business_name']
+
+        if 'business_address' in validated_data and validated_data['business_address']:
+            user.address = validated_data['business_address']
+
+        if 'name' in validated_data and validated_data['name']:
+            user.username = validated_data['name']
+        
         user.save()
         return user
 
 class GetUserProfileSerializer(BaseSerializer):
-    autoId = miniproject_base_serializer.CharField(source='get_auto_id')
-    userId = miniproject_base_serializer.CharField(source='get_object_id')
-    business_user_id = miniproject_base_serializer.CharField(source='get_business_user_id')
+    userId = miniproject_base_serializer.CharField(source='get_user_id')
     mobile_number = miniproject_base_serializer.CharField(source='get_phone')
 
     class Meta:
         model = User
-        fields = ('autoId','userId','mobile_number','photo','business_user_id')
+        fields = ('userId','mobile_number','photo','business_name','address','username')
 
 class UserPasswordUpdateSerializer(BasePlainSerializer):
     oldPassword = miniproject_base_serializer.CharField(min_length=5, max_length=35,required=True,allow_blank=False, error_messages={

@@ -10,3 +10,5 @@ pycryptodome==3.4.11 # for encryption and decryption
 django-cors-headers==2.0.0
 gunicorn==19.7.1 # gunicorn
 firebase-admin==2.10.0
+python-dateutil==2.7.3 # python datetime
+django-allauth==0.35.0 #authentication
