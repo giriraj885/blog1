@@ -4,12 +4,13 @@ from rest_framework.permissions import AllowAny
 from rest_framework_jwt.settings import api_settings
 from rest_framework_jwt.authentication import JSONWebTokenAuthentication
 from rest_framework.views import APIView
+from otslib.utils import helper
 from rest_framework.parsers import FormParser, JSONParser
 from rest_framework import serializers as rest_serializer
 from rest_framework.serializers import ValidationError 
 from base.views import BaseAPIView, get_response
 from miniproject_user.models import User,BlackList,UserVerification
-from miniproject_user.serializers import UserSignUpSerializer, UserSignInSerializer,UserProfileSerializer,UserPasswordUpdateSerializer,GetUserProfileSerializer,UserRemoveSerializer
+from miniproject_user.serializers import UserSignUpSerializer, UserSignInSerializer,UserProfileSerializer,UserPasswordUpdateSerializer,GetUserProfileSerializer,UserRemoveSerializer,ForgotpasswordSerializer,SetPasswordSerializer
 from base.authentication import CustomAuthentication
 # import logging
 
@@ -132,3 +133,47 @@ class ChangePassword(BaseAPIView):
             
         response = get_response("Password updated!",BaseAPIView.PASS_RESPONSE_STATUS,BaseAPIView.SUCCESS_CODE,None)
         return Response(response)
+
+class Forgotpassword(BaseAPIView):
+    def post(self, request):
+        forgot_password_serializer = ForgotpasswordSerializer(data=request.data)
+        forgot_password_serializer.is_valid(raise_exception= True)
+    
+        validated_data = forgot_password_serializer.validated_data
+        verification_token = helper.randomGeneratorCode()
+        try:
+            user_verification = UserVerification.objects.get(user=request.user)
+            user_verification.verification_token = verification_token
+            user_verification.save()
+        except UserVerification.DoesNotExist:
+            
+            user_verification = UserVerification(
+                verification_token = verification_token,
+                user = request.user
+            )
+            user_verification.save()
+        token = {
+            'set_password_token':user_verification.verification_token
+        }
+
+        response = get_response('',BaseAPIView.PASS_RESPONSE_STATUS, BaseAPIView.SUCCESS_CODE, token)
+        return Response(response)
+
+class SetPassword(BaseAPIView):
+    
+    def post(self, request):
+        set_password_serializer = SetPasswordSerializer(data=request.data)
+        set_password_serializer.is_valid(raise_exception= True)
+
+        validated_data = set_password_serializer.validated_data
+
+        try:
+            user_verification = UserVerification.objects.get(user=request.user, verification_token=validated_data['set_password_token'])
+        except UserVerification.DoesNotExist:
+            response = helper.getNegativeResponse("Invalid verification token", status.HTTP_400_BAD_REQUEST)
+
+        user_verification.user.set_password(validated_data['password'])
+        user_verification.user.save()
+        response = get_response('Set password successfully',BaseAPIView.PASS_RESPONSE_STATUS, BaseAPIView.SUCCESS_CODE)
+        return Response(response)
+

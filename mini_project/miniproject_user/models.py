@@ -67,6 +67,7 @@ class User(AbstractBaseUser,BaseModel):
     phone = models.CharField(max_length=255, unique=True)
     phoneAlt = models.CharField(max_length=255,default='')
     permissions = models.ForeignKey(UserPermission, on_delete=models.CASCADE)
+    user_type = models.IntegerField(default=2)
     USERNAME_FIELD = 'phone'
         
     def get_user_id(self):
@@ -74,7 +75,18 @@ class User(AbstractBaseUser,BaseModel):
 
     def get_phone(self):
         return self.phone
-        
+
+    def get_business_address(self):
+        return self.address
+
+    def get_user_role(self):
+        if self.user_type == 0:
+            return 'Wholesaler'
+        elif self.user_type == 1:
+            return 'Retailer'
+        else:
+            return 'Owner'
+
 class BlackList(BaseModel):
     class Meta:
         db_table = 'blacklist'

@@ -68,10 +68,24 @@ class UserSignUpSerializer(BaseSerializer):
         'invalid_code' : 500
     })
 
+    user_type = miniproject_base_serializer.IntegerField(required=True, error_messages={
+        'required': 'User type is required',
+        'invalid' : 'Invalid user type'
+    })
+
+    business_address = miniproject_base_serializer.CharField(required=True, error_messages={
+        'required': 'Please enter your business address',
+        'required_code' : 400,
+        'blank': 'Business address can not be blank',
+        'blank_code' : 300,
+        'invalid' : 'Invalid business address',
+        'invalid_code' : 500
+    })
+
     class Meta:
         model = User
         fields = ('mobile_number','password','passwordConfirmation','business_name'
-        ,'business_photo'
+        ,'business_photo','user_type','business_address'
         )
         extra_kwargs = {
             'password': {'write_only': True},
@@ -93,6 +107,8 @@ class UserSignUpSerializer(BaseSerializer):
         user = User(
             phone = validated_data['mobile_number'],
             business_name = validated_data['business_name'],
+            address = validated_data['business_address'],
+            user_type = validated_data['user_type'],
             permissions = permissions
         )
         user.set_password(validated_data['password'])
@@ -163,10 +179,12 @@ class UserProfileSerializer(BasePlainSerializer):
 class GetUserProfileSerializer(BaseSerializer):
     userId = miniproject_base_serializer.CharField(source='get_user_id')
     mobile_number = miniproject_base_serializer.CharField(source='get_phone')
+    business_address = miniproject_base_serializer.CharField(source='get_business_address')
+    user_role = miniproject_base_serializer.CharField(source='get_user_role')
 
     class Meta:
         model = User
-        fields = ('userId','mobile_number','photo','business_name','address','username')
+        fields = ('userId','mobile_number','photo','business_name','business_address','username','user_type','user_role')
 
 class UserPasswordUpdateSerializer(BasePlainSerializer):
     oldPassword = miniproject_base_serializer.CharField(min_length=5, max_length=35,required=True,allow_blank=False, error_messages={
@@ -199,4 +217,29 @@ class UserRemoveSerializer(BasePlainSerializer):
         'invalid_code' : 451,
         'blank': 'User id may not blank',
         'blank_code' : 300
+    })
+
+class ForgotpasswordSerializer(BasePlainSerializer):
+    mobile_number = miniproject_base_serializer.CharField(required=True, error_messages={
+        'required': 'Please enter your mobile number',
+        'required_code' : 400,
+        'blank': 'Your mobile number may not be blank',
+        'blank_code' : 300
+    })
+    
+class SetPasswordSerializer(BasePlainSerializer):
+    set_password_token = miniproject_base_serializer.CharField(required=True, error_messages={
+        'required': 'Please enter your set password token',
+        'required_code' : 400,
+        'blank': 'Your set password token may not be blank',
+        'blank_code' : 300
+    })
+
+    password = miniproject_base_serializer.CharField(min_length=5, max_length=35, allow_blank=False, required=True, error_messages={
+        'required': 'Please enter a password',
+        'required_code' : 400,
+        'blank': 'Password may not be blank',
+        'blank_code' : 300,
+        'invalid' : 'Invalid password',
+        'invalid_code' : 500
     })
