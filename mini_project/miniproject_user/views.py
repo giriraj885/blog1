@@ -5,21 +5,14 @@ from rest_framework_jwt.settings import api_settings
 from rest_framework_jwt.authentication import JSONWebTokenAuthentication
 from rest_framework.views import APIView
 from otslib.utils import helper
-<<<<<<< HEAD
-=======
 from django.db.models import Q
 from base import constants
->>>>>>> 898b81c7caf06a088415c27366de9ab7cccf3d25
 from rest_framework.parsers import FormParser, JSONParser
 from rest_framework import serializers as rest_serializer
 from rest_framework.serializers import ValidationError 
 from base.views import BaseAPIView, get_response
 from miniproject_user.models import User,BlackList,UserVerification
-<<<<<<< HEAD
-from miniproject_user.serializers import UserSignUpSerializer, UserSignInSerializer,UserProfileSerializer,UserPasswordUpdateSerializer,GetUserProfileSerializer,UserRemoveSerializer,ForgotpasswordSerializer,SetPasswordSerializer
-=======
 from miniproject_user.serializers import UserSignUpSerializer, UserSignInSerializer,UserProfileSerializer,UserPasswordUpdateSerializer,GetUserProfileSerializer,UserRemoveSerializer,ForgotpasswordSerializer,SetPasswordSerializer,GetUserListSerializer
->>>>>>> 898b81c7caf06a088415c27366de9ab7cccf3d25
 from base.authentication import CustomAuthentication
 # import logging
 
@@ -154,38 +147,6 @@ class ChangePassword(BaseAPIView):
             return Response(response, status=response['statusCode'])
             # raise ValidationError('Old password is not valid.') 
             
-<<<<<<< HEAD
-        response = get_response("Password updated!",BaseAPIView.PASS_RESPONSE_STATUS,BaseAPIView.SUCCESS_CODE,None)
-        return Response(response)
-
-class Forgotpassword(BaseAPIView):
-    def post(self, request):
-        forgot_password_serializer = ForgotpasswordSerializer(data=request.data)
-        forgot_password_serializer.is_valid(raise_exception= True)
-    
-        validated_data = forgot_password_serializer.validated_data
-        verification_token = helper.randomGeneratorCode()
-        try:
-            user_verification = UserVerification.objects.get(user=request.user)
-            user_verification.verification_token = verification_token
-            user_verification.save()
-        except UserVerification.DoesNotExist:
-            
-            user_verification = UserVerification(
-                verification_token = verification_token,
-                user = request.user
-            )
-            user_verification.save()
-        token = {
-            'set_password_token':user_verification.verification_token
-        }
-
-        response = get_response('',BaseAPIView.PASS_RESPONSE_STATUS, BaseAPIView.SUCCESS_CODE, token)
-        return Response(response)
-
-class SetPassword(BaseAPIView):
-    
-=======
         response = helper.getPositiveResponse("Password updated!")
         return Response(response)
 
@@ -224,7 +185,6 @@ class Forgotpassword(BaseAPIView):
 class SetPassword(BaseAPIView):
     permission_classes = (AllowAny,)
 
->>>>>>> 898b81c7caf06a088415c27366de9ab7cccf3d25
     def post(self, request):
         set_password_serializer = SetPasswordSerializer(data=request.data)
         set_password_serializer.is_valid(raise_exception= True)
@@ -232,17 +192,6 @@ class SetPassword(BaseAPIView):
         validated_data = set_password_serializer.validated_data
 
         try:
-<<<<<<< HEAD
-            user_verification = UserVerification.objects.get(user=request.user, verification_token=validated_data['set_password_token'])
-        except UserVerification.DoesNotExist:
-            response = helper.getNegativeResponse("Invalid verification token", status.HTTP_400_BAD_REQUEST)
-
-        user_verification.user.set_password(validated_data['password'])
-        user_verification.user.save()
-        response = get_response('Set password successfully',BaseAPIView.PASS_RESPONSE_STATUS, BaseAPIView.SUCCESS_CODE)
-        return Response(response)
-
-=======
             user_verification = UserVerification.objects.get(verification_token=validated_data['set_password_token'])
         except UserVerification.DoesNotExist:
             response = helper.getNegativeResponse("Invalid verification token")
@@ -312,4 +261,3 @@ class ManageUser(BaseAPIView):
         else:    
             response = helper.getPositiveResponse("", response_data)
         return Response(response, status=response['statusCode'])
->>>>>>> 898b81c7caf06a088415c27366de9ab7cccf3d25

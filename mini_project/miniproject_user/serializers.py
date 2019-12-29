@@ -243,8 +243,6 @@ class SetPasswordSerializer(BasePlainSerializer):
         'invalid' : 'Invalid password',
         'invalid_code' : 500
     })
-<<<<<<< HEAD
-=======
 
 class GetUserListSerializer(BaseSerializer):
     userId = miniproject_base_serializer.CharField(source='get_user_id')
@@ -256,4 +254,3 @@ class GetUserListSerializer(BaseSerializer):
     class Meta:
         model = User
         fields = ('userId','mobile_number','photo','business_name','business_address','username','user_type','user_role','business_photo')
->>>>>>> 898b81c7caf06a088415c27366de9ab7cccf3d25
