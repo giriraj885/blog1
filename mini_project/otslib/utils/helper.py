@@ -88,7 +88,7 @@ def getPositiveResponse(msg, data={}):
     response['statusCode'] = constants.SUCESS_RESPONSE_CODE
     return response
 
-def getNegativeResponse(msg, status_code=400, result={}):
+def getNegativeResponse(msg, status_code=200, result={}):
     response = {}
     response['status'] = constants.FAIL
     response['message'] = msg

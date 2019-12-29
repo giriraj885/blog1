@@ -2,6 +2,7 @@ from django.contrib.auth.models import AbstractBaseUser
 from django.contrib.auth.models import BaseUserManager
 from django.db import models
 from base.models import BaseModel
+from base import constants
 
 class UserPermission(BaseModel):
     class Meta:
@@ -86,6 +87,8 @@ class User(AbstractBaseUser,BaseModel):
             return 'Retailer'
         else:
             return 'Owner'
+    def get_business_photo(self):
+        return constants.NO_USER_IMAGE
 
 class BlackList(BaseModel):
     class Meta:
