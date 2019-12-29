@@ -16,3 +16,6 @@ EXCEPTION_HANDLER = {
     "Invalid signature." : "Authentication failed, please re-login.",
     "Incorrect authentication credentials."  : "Authentication failed, please re-login."
 }
+
+USER_PER_PAGE = 20
+NO_USER_IMAGE = 'https://images-na.ssl-images-amazon.com/images/I/61Krpl7FGyL._SX425_.jpg'
