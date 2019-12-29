@@ -1,6 +1,7 @@
 *.pyc
 .vscode/
 env/
+..env/
 node_modules/
 
 # dependencies

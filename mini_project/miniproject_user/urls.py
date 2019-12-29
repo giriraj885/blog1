@@ -8,5 +8,8 @@ urlpatterns = [
     url(r'^profile/get/',views.UserProfileUpdate.as_view(), name='user_profile_get') ,
     url(r'^delete',views.UserProfileUpdate.as_view(), name='user_delete'),
     url(r'^logout', views.Logout.as_view(), name='user_logout'),
-    url(r'^password/update', views.ChangePassword.as_view(), name='password')
+    url(r'^password/update', views.ChangePassword.as_view(), name='update_password'),
+    url(r'^forgot/password', views.Forgotpassword.as_view(), name='forgot_password'),
+    url(r'^set/password', views.SetPassword.as_view(), name='set_password')
+    
 ]
