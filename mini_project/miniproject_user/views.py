@@ -220,16 +220,17 @@ class ManageUser(BaseAPIView):
         if request.GET['user_type'] == '0':
             user_list = User.objects.filter(
                 ~Q(phone__in = phone_list),
-                user_type=request.GET['user_type']
+                user_type=1
             )
+            
 
         elif request.GET['user_type'] == '1':
             user_list = User.objects.filter(
                 ~Q(phone__in = phone_list),
-                user_type=request.GET['user_type']
+                user_type=0
             )
+            
 
-        
         if 'page_no' in request.GET and request.GET['page_no']!='0':
             page_end = int(request.GET['page_no']) * user_per_page
             page_start = page_end - user_per_page
