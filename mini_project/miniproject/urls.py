@@ -21,5 +21,6 @@ urlpatterns = [
     url(r'^admin/', admin.site.urls),
     url(r'^user/', include('miniproject_user.urls')),
     url(r'^base/', include('base.urls')),
+    url(r'^v1/account/', include('v1.account.urls')),
 
 ]

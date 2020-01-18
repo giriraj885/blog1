@@ -3,6 +3,7 @@ from django.contrib.auth.models import BaseUserManager
 from django.db import models
 from base.models import BaseModel
 from base import constants
+from django.contrib.postgres.fields import ArrayField
 
 class UserPermission(BaseModel):
     class Meta:
@@ -69,6 +70,7 @@ class User(AbstractBaseUser,BaseModel):
     phoneAlt = models.CharField(max_length=255,default='')
     permissions = models.ForeignKey(UserPermission, on_delete=models.CASCADE)
     user_type = models.IntegerField(default=2)
+    fcm_token = ArrayField(models.TextField(default=""),default=[])
     USERNAME_FIELD = 'phone'
         
     def get_user_id(self):
@@ -87,7 +89,11 @@ class User(AbstractBaseUser,BaseModel):
             return 'Retailer'
         else:
             return 'Owner'
+<<<<<<< HEAD
     
+=======
+
+>>>>>>> cfae516c76bb09eecaa94c2e930d6627469b133c
     def get_business_photo(self):
         return constants.NO_USER_IMAGE
 class BlackList(BaseModel):

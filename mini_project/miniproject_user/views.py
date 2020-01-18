@@ -10,9 +10,9 @@ from base import constants
 from rest_framework.parsers import FormParser, JSONParser
 from rest_framework import serializers as rest_serializer
 from rest_framework.serializers import ValidationError 
-from base.views import BaseAPIView, get_response
+from base.views import BaseAPIView
 from miniproject_user.models import User,BlackList,UserVerification
-from miniproject_user.serializers import UserSignUpSerializer, UserSignInSerializer,UserProfileSerializer,UserPasswordUpdateSerializer,GetUserProfileSerializer,UserRemoveSerializer,ForgotpasswordSerializer,SetPasswordSerializer,GetUserListSerializer
+from miniproject_user.serializers import UserSignUpSerializer, UserSignInSerializer,UserProfileSerializer,UserPasswordUpdateSerializer,GetUserProfileSerializer,UserRemoveSerializer,ForgotpasswordSerializer,SetPasswordSerializer,GetUserListSerializer,FCMTokenSerializer
 from base.authentication import CustomAuthentication
 # import logging
 
@@ -98,9 +98,6 @@ class UserProfileUpdate(BaseAPIView):
             user_remove_serializer = UserRemoveSerializer(data=request.data)
             print(user_remove_serializer)
             user_remove_serializer.is_valid(raise_exception=True)
-                # response = self.getErrorResponse(user_remove_serializer, status.HTTP_400_BAD_REQUEST)
-                # print(response)
-                # return Response(response, status=response['statusCode'])
             validated_data = user_remove_serializer.validated_data
 
             user = User.objects.get(id=validated_data['user_id'])
@@ -118,6 +115,10 @@ class Logout(BaseAPIView):
             token = request.META['HTTP_AUTHORIZATION'][4:]
             black_list_token = BlackList(token=token)
             black_list_token.save()
+            if 'fcm_token' in request.data and request.data['fcm_token']:
+                request.user.fcm_token.remove(request.data['fcm_token'])
+                request.user.save()
+
             response = helper.getPositiveResponse("User logged out")
         except Exception as e:
             raise ValidationError(e)
@@ -214,22 +215,10 @@ class ManageUser(BaseAPIView):
         phone_list = []
         user_list = []
         phone_list.append(request.user.phone)
-        if 'user_type' not in request.GET:
-            raise rest_serializer.ValidationError('User type id is required')
 
-        if request.GET['user_type'] == '0':
-            user_list = User.objects.filter(
-                ~Q(phone__in = phone_list),
-                user_type=1
-            )
-            
-
-        elif request.GET['user_type'] == '1':
-            user_list = User.objects.filter(
-                ~Q(phone__in = phone_list),
-                user_type=0
-            )
-            
+        user_list = User.objects.filter(
+            ~Q(phone__in = phone_list)
+        )     
 
         if 'page_no' in request.GET and request.GET['page_no']!='0':
             page_end = int(request.GET['page_no']) * user_per_page
@@ -261,4 +250,17 @@ class ManageUser(BaseAPIView):
             response = helper.getPositiveResponse("No user found", response_data)
         else:    
             response = helper.getPositiveResponse("", response_data)
+        return Response(response, status=response['statusCode'])
+
+    def post(self, request):
+        response = {}
+        # try:   
+        user = request.user
+        fcm_serializer = FCMTokenSerializer(User.objects.get(id=user.id),data=request.data)
+        if fcm_serializer.is_valid() == False:
+            response = self.getErrorResponse(fcm_serializer, status.HTTP_400_BAD_REQUEST)
+            return Response(response, status=response['statusCode'])
+
+        fcm_serializer.save()
+        response = helper.getPositiveResponse("")
         return Response(response, status=response['statusCode'])

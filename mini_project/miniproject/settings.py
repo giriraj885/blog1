@@ -45,7 +45,8 @@ INSTALLED_APPS = [
     'rest_framework',
     'rest_framework_jwt',
     'miniproject_user',
-    'base'
+    'base',
+    'v1.account'
 ]
 
 MIDDLEWARE_CLASSES = [
@@ -135,8 +136,8 @@ JWT_AUTH = {
     'JWT_AUDIENCE': None,
     'JWT_ISSUER': None,
     'JWT_ALLOW_REFRESH': False,
-    'JWT_REFRESH_EXPIRATION_DELTA': datetime.timedelta(days=7),
-    'JWT_EXPIRATION_DELTA': datetime.timedelta(days=7),
+    'JWT_REFRESH_EXPIRATION_DELTA': datetime.timedelta(days=60),
+    'JWT_EXPIRATION_DELTA': datetime.timedelta(days=60),
     'JWT_AUTH_HEADER_PREFIX': 'JWT',
 }
 

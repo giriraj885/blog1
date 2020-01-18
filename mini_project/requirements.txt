@@ -11,4 +11,6 @@ django-cors-headers==2.0.0
 gunicorn==19.7.1 # gunicorn
 firebase-admin==2.10.0
 python-dateutil==2.7.3 # python datetime
+requests==2.18.4 # used to reading file from listhub
+google-cloud-storage==1.8.0
 django-allauth==0.35.0 #authentication
