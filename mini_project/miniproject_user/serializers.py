@@ -68,10 +68,10 @@ class UserSignUpSerializer(BaseSerializer):
         'invalid_code' : 500
     })
 
-    user_type = miniproject_base_serializer.IntegerField(required=True, error_messages={
-        'required': 'User type is required',
-        'invalid' : 'Invalid user type'
-    })
+    # user_type = miniproject_base_serializer.IntegerField(required=True, error_messages={
+    #     'required': 'User type is required',
+    #     'invalid' : 'Invalid user type'
+    # })
 
     business_address = miniproject_base_serializer.CharField(required=True, error_messages={
         'required': 'Please enter your business address',
@@ -85,7 +85,7 @@ class UserSignUpSerializer(BaseSerializer):
     class Meta:
         model = User
         fields = ('mobile_number','password','passwordConfirmation','business_name'
-        ,'business_photo','user_type','business_address'
+        ,'business_photo','business_address'
         )
         extra_kwargs = {
             'password': {'write_only': True},
@@ -108,7 +108,7 @@ class UserSignUpSerializer(BaseSerializer):
             phone = validated_data['mobile_number'],
             business_name = validated_data['business_name'],
             address = validated_data['business_address'],
-            user_type = validated_data['user_type'],
+            # user_type = validated_data['user_type'],
             permissions = permissions
         )
         user.set_password(validated_data['password'])
@@ -184,7 +184,7 @@ class GetUserProfileSerializer(BaseSerializer):
 
     class Meta:
         model = User
-        fields = ('userId','mobile_number','photo','business_name','business_address','username','user_type','user_role')
+        fields = ('userId','mobile_number','photo','business_name','business_address','username','user_role')
 
 class UserPasswordUpdateSerializer(BasePlainSerializer):
     oldPassword = miniproject_base_serializer.CharField(min_length=5, max_length=35,required=True,allow_blank=False, error_messages={
