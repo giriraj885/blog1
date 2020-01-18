@@ -19,3 +19,5 @@ EXCEPTION_HANDLER = {
 
 USER_PER_PAGE = 20
 NO_USER_IMAGE = 'https://images-na.ssl-images-amazon.com/images/I/61Krpl7FGyL._SX425_.jpg'
+
+NOTIFICATION_ICON="https://img.icons8.com/bubbles/2x/appointment-reminders.png"

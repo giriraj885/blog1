@@ -1,0 +1,12 @@
+{
+    "type": "service_account",
+    "project_id": "bussinessapp-ab850",
+    "private_key_id": "3321e6701239c853a237d28b06309bd737791973",
+    "private_key": "-----BEGIN PRIVATE KEY-----\nMIIEvwIBADANBgkqhkiG9w0BAQEFAASCBKkwggSlAgEAAoIBAQDXxx/bY96+8AYh\n29YOFTS6RbMByokM28Pljm7CXo45oMxCfDfStjRr+Jua2WVtfNgLHSlCooZlTkFd\nAY8IKqci4MzxcV42ddPwpEOY5w6kYVbDtc2TMDOs7B3CwUZcu35jbj7sa8VsQibN\nTtpHhABhscvHcUJ4k6CaPBbCDRF8qO6FiPW3MxeRZdtgs2qC32bwoc7R8RCvIc3o\nBkmSxghlpLFmuzUbdJ2J7/cDgWpgX7ZMBxh5SGpFNbI/y9sSxvFl5GBDkB43R093\n2RBp75Aalxxl+Ng+P2Lt+N8Y9HhFxAmchES5gQsuxTlb4/oCdjOCxnv2vQ0dGcxK\nwknkDLh/AgMBAAECggEAEO2cyLPxli4zdPWPugQc4l40eHgAv4MAP+KoOtR7OPct\n/ytKn9vOigfzgTb795Z7RofvpDwm6gy1IQxNwdjCywAy4+A+gWxGB9ODQBwkcG34\nhhsduSXnb/IINa6/C+hjtn5ALoEX+HHKJIJCqqim9QMjVw7CJb6DM4ZyTKAE1rAv\nPDveBJSbVs6chSAN05puJhGvxUOpuacFjhBJ4wfb4aA/Y7gJAhmQ632rESqyxZSH\nED0/PjmEKtzwmFMVYEO8zXhAKmU280KviN/qQd82Sk6uCQ5GDAEpfu98tZJMni1x\nhUqC3rCKikeA8YmpTZsk42F34+uywyrQriuhy1FFFQKBgQDzFuQkQaMeUWJonamK\nrD/Dx7K/Pe5eFvC3cmcPWbclx1BDAbmsY0ykAptjgACfgVTuMH2Inp0IEp5V5ygt\nhWHZeYPG6pNdUZwdxDnHmNBRMT5RQeWhcw2naXyS0Dxjs9fY/JHjY8jCmN4cum3E\nD/U0vV5bDV2x26F2e/oWbFryWwKBgQDjPOXIZl61o2YK/F5/Fjf8KUQDG6TxHb5b\n8D1qZ5NVXMYNpwhRt/QKtCNHw9g6drcZ03l0mFXGAnAnCCsZaDIHjoTQrtUzynni\n7e4MDsPFkfC9A3JVoBb+p9zimZQ/EVWjIdmGyuHfViSxLgqLuUWYTNheYk9qDOMR\n0aeD24WjrQKBgQDeoSdeQTLYEGcVMtfUZf6cGmeNGHYXe+EH0WGrwFmo4sqSI6Fd\nzS+iwbR4QwHPE06qOoStu75LZ2nVeLfmQNMlrlFOuwUtoRFefZkBQOYAhh3xo21g\nGJP3r/dkKgw0r7/OPTqLS5bRCdnZ66+dsZO7sncY4rvdqS1N6ytWn/QHIwKBgQCG\nPaeRZ8hzjX/u5X/9m+ae9NHU9DPQrT2TmqztexqyxwfJcO+dNwrYd+qPrsbCYvdw\nLloF4yhovW/73vt3GvLTPAKCNYaF/gtbYCvMu7wzry+EudCFfPmYnxoCU7AcQeVR\nZeHXm2ssQPuUIBriyCSxAFSiDXnUsKBEGpLXdovQUQKBgQCiLqABMsKHfZqv0RYe\nGKvNlc4Zbp8vNztKUxhDtkY3Uitxf2j51TQupZyJeX5VJthqHD6tCs5Y93nniXez\nqt4NOVpZVqVYqrjI6pTbsIpVOqsp517hvURPT+9nkCYp21L4vh/SNRzMJ/59afo5\n5L2nGxKDXgYXyFQWblOQthh+yg==\n-----END PRIVATE KEY-----\n",
+    "client_email": "firebase-adminsdk-leksu@bussinessapp-ab850.iam.gserviceaccount.com",
+    "client_id": "108660626829415705037",
+    "auth_uri": "https://accounts.google.com/o/oauth2/auth",
+    "token_uri": "https://oauth2.googleapis.com/token",
+    "auth_provider_x509_cert_url": "https://www.googleapis.com/oauth2/v1/certs",
+    "client_x509_cert_url": "https://www.googleapis.com/robot/v1/metadata/x509/firebase-adminsdk-leksu%40bussinessapp-ab850.iam.gserviceaccount.com"
+  }

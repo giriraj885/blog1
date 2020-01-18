@@ -254,3 +254,20 @@ class GetUserListSerializer(BaseSerializer):
     class Meta:
         model = User
         fields = ('userId','mobile_number','photo','business_name','business_address','username','user_type','user_role','business_photo')
+
+class FCMTokenSerializer(BasePlainSerializer):
+    fcm_token = miniproject_base_serializer.CharField(required=False, allow_blank=True,default='', error_messages={
+        'invalid' : 'Invalid fcm token',
+        'invalid_code' : 500
+    })
+
+    def update(self, instance, validated_data):
+        user = instance
+        fcm_token = validated_data['fcm_token']
+
+        if fcm_token not in user.fcm_token:
+            user.fcm_token.append(fcm_token)            
+            user.save()
+            
+        return user
+
