@@ -89,11 +89,6 @@ class User(AbstractBaseUser,BaseModel):
             return 'Retailer'
         else:
             return 'Owner'
-<<<<<<< HEAD
-    
-=======
-
->>>>>>> cfae516c76bb09eecaa94c2e930d6627469b133c
     def get_business_photo(self):
         return constants.NO_USER_IMAGE
 class BlackList(BaseModel):
