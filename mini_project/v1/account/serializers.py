@@ -68,3 +68,65 @@ class ManageAccountSerializer(BaseSerializer):
                 token
             )
         return account_management
+
+class GetCreditDetailSerializer(BaseSerializer):
+    credit = miniproject_base_serializer.SerializerMethodField()
+    debit = miniproject_base_serializer.SerializerMethodField()
+    credit_date = miniproject_base_serializer.CharField(source='get_credit_user_date')
+    debit_date = miniproject_base_serializer.SerializerMethodField()
+    credit_user_id = miniproject_base_serializer.SerializerMethodField()
+    debit_user_id =miniproject_base_serializer.SerializerMethodField()
+    total_balance = miniproject_base_serializer.SerializerMethodField()
+
+    class Meta:
+        model = AccountManagement
+        fields = ('note','debit_user_id','credit','debit','credit_date','debit_date','credit_user_id','total_balance')
+
+    def get_credit(self, accountmanagement):
+        return accountmanagement.price
+
+    def get_debit(self, accountmanagement):
+        return ''
+
+    def get_credit_user_id(self, accountmanagement):
+        return accountmanagement.credit_user.id
+
+    def get_debit_user_id(self, accountmanagement):
+        return accountmanagement.debit_user.id
+
+    def get_debit_date(self, accountmanagement):
+        return ''
+
+    def get_total_balance(self, accountmanagement):
+        return 0
+
+class GetDebitDetailSerializer(BaseSerializer):
+    credit = miniproject_base_serializer.SerializerMethodField()
+    debit = miniproject_base_serializer.SerializerMethodField()
+    debit_user_id =miniproject_base_serializer.SerializerMethodField()
+    credit_date = miniproject_base_serializer.SerializerMethodField()
+    debit_date = miniproject_base_serializer.CharField(source='get_debit_user_date')
+    credit_user_id = miniproject_base_serializer.SerializerMethodField()
+    total_balance = miniproject_base_serializer.SerializerMethodField()
+
+    class Meta:
+        model = AccountManagement
+        fields = ('note','debit_user_id','credit','debit','credit_date','debit_date','credit_user_id','total_balance')
+
+    def get_credit(self, accountmanagement):
+        return ''
+
+    def get_debit(self, accountmanagement):
+        return accountmanagement.price
+
+    def get_debit_user_id(self, accountmanagement):
+        return accountmanagement.debit_user.id
+
+    def get_credit_date(self, accountmanagement):
+        return ''
+
+    def get_credit_user_id(self, accountmanagement):
+        return accountmanagement.credit_user.id
+
+    def get_total_balance(self, accountmanagement):
+        return 0

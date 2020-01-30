@@ -3,13 +3,15 @@ from rest_framework.response import Response
 from rest_framework_jwt.authentication import JSONWebTokenAuthentication
 from rest_framework.permissions import AllowAny
 from base.authentication import CustomAuthentication
-from rest_framework.serializers import ValidationError 
+from rest_framework.serializers import ValidationError
+from base import constants
+from otslib.utils import helper
 import string
 import random
 from Crypto.Cipher import AES
 import os
 
-RECORDS_PER_PAGE = 10
+RECORDS_PER_PAGE = 20
 
 def get_response(msg, status=True, statusCode=200, result=None, errorList=[]):
     response = {}
@@ -129,5 +131,35 @@ class BaseAPIView(APIView):
     # GENRIC METHOD FOR ERROR HANDLING
     def getErrorResponse(self, serializer, status_code):
         return
+
+    def getValidationErrorMessage(self, error, status_code, is_message=False):
+        if isinstance(error, list):
+            if isinstance(error[0], dict):
+                error_message = helper.getFirstErrorMessage(error[0])
+                if error_message in constants.EXCEPTION_HANDLER:
+                    response = helper.getNegativeResponse(constants.EXCEPTION_HANDLER[error_message], status_code)
+                else:
+                    if is_message == False:
+                        response = helper.getNegativeResponse(helper.getErrorMessage(error[0]), status_code)
+                    if is_message == True:
+                        response = helper.getNegativeResponse(error_message, status_code)
+
+            if isinstance(error[0], str):
+                if error[0] in constants.EXCEPTION_HANDLER:
+                    response = helper.getNegativeResponse(constants.EXCEPTION_HANDLER[error[0]], status_code)
+                else:
+                    response = helper.getNegativeResponse(error[0], status_code)
+
+        elif isinstance(error, dict):
+            error_message = helper.getFirstErrorMessage(error)
+            if error_message in constants.EXCEPTION_HANDLER:
+                response = helper.getNegativeResponse(constants.EXCEPTION_HANDLER[error_message], status_code)
+            else:
+                if is_message == False:                    
+                    response = helper.getNegativeResponse(helper.getErrorMessage(error), status_code)
+                if is_message == True:
+                    response = helper.getNegativeResponse(error_message, status_code)
+
+        return response
 
 
