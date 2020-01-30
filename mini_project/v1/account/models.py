@@ -11,5 +11,11 @@ class AccountManagement(BaseModel):
     price = models.IntegerField(default=0)
     note = models.CharField(max_length=255,default='')
     current_time = models.DateTimeField(auto_now_add=True)
+
+    def get_credit_user_date(self):
+        return self.created_date_time
+
+    def get_debit_user_date(self):
+        return self.created_date_time
     
     

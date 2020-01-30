@@ -2,8 +2,17 @@ from django.contrib.auth.models import AbstractBaseUser
 from django.contrib.auth.models import BaseUserManager
 from django.db import models
 from base.models import BaseModel
-from base import constants
+from base import constants, helper
 from django.contrib.postgres.fields import ArrayField
+import os
+
+def wrapper(instance, filename):
+    filename = '{}.{}'.format(str(instance.pk) + '_' + helper.randomGeneratorCode(), 'jpg')        
+    return os.path.join('profile_photos', filename)
+
+def path_and_rename():
+    return wrapper
+
 
 class UserPermission(BaseModel):
     class Meta:
@@ -71,6 +80,7 @@ class User(AbstractBaseUser,BaseModel):
     permissions = models.ForeignKey(UserPermission, on_delete=models.CASCADE)
     user_type = models.IntegerField(default=2)
     fcm_token = ArrayField(models.TextField(default=""),default=[])
+    profile_photo =	models.ImageField(upload_to=path_and_rename(), blank=True, null=True, default='')
     USERNAME_FIELD = 'phone'
         
     def get_user_id(self):
