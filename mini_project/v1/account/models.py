@@ -1,6 +1,7 @@
 from django.db import models
 from base.models import BaseModel
 from miniproject_user.models import User
+from base import helper,constants
 
 class AccountManagement(BaseModel):
     class Meta:
@@ -13,9 +14,9 @@ class AccountManagement(BaseModel):
     current_time = models.DateTimeField(auto_now_add=True)
 
     def get_credit_user_date(self):
-        return self.created_date_time
+        return helper.datetimeToStringDateTime(self.created_date_time, constants.DATE_FORMAT)
 
     def get_debit_user_date(self):
-        return self.created_date_time
+        return helper.datetimeToStringDateTime(self.created_date_time, constants.DATE_FORMAT)
     
     

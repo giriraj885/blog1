@@ -17,6 +17,7 @@ EXCEPTION_HANDLER = {
     "Incorrect authentication credentials."  : "Authentication failed, please re-login."
 }
 
+DATE_FORMAT = '%Y-%m-%d %H:%M:%S'
 USER_PER_PAGE = 20
 NO_USER_IMAGE = 'https://images-na.ssl-images-amazon.com/images/I/61Krpl7FGyL._SX425_.jpg'
 

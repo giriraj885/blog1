@@ -27,7 +27,10 @@ DEBUG = True
 
 ALLOWED_HOSTS = ['159.65.151.99']
 # ALLOWED_HOSTS = []
+CORS_ORIGIN_ALLOW_ALL = True
 AUTH_USER_MODEL = 'miniproject_user.User'
+
+SITE_ID= 1
 
 
 # Application definition
@@ -62,6 +65,11 @@ MIDDLEWARE_CLASSES = [
 ]
 
 ROOT_URLCONF = 'miniproject.urls'
+
+STATICFILES_DIRS = (
+    os.path.join(BASE_DIR, "static"),
+)
+
 
 TEMPLATES = [
     {
@@ -178,4 +186,15 @@ USE_TZ = True
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/1.11/howto/static-files/
 
+
+# List of upload handler classes to be applied in order.
+FILE_UPLOAD_HANDLERS = [
+    'django.core.files.uploadhandler.MemoryFileUploadHandler',
+    'django.core.files.uploadhandler.TemporaryFileUploadHandler',
+]
+
+
 STATIC_URL = '/static/'
+
+ACCOUNT_USER_MODEL_USERNAME_FIELD = 'phone'
+
