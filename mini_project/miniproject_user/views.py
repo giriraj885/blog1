@@ -12,7 +12,7 @@ from rest_framework import serializers as rest_serializer
 from rest_framework.serializers import ValidationError 
 from base.views import BaseAPIView
 from miniproject_user.models import User,BlackList,UserVerification
-from miniproject_user.serializers import UserSignUpSerializer, UserSignInSerializer,UserProfileSerializer,UserPasswordUpdateSerializer,GetUserProfileSerializer,UserRemoveSerializer,ForgotpasswordSerializer,SetPasswordSerializer,GetUserListSerializer,FCMTokenSerializer
+from miniproject_user.serializers import UserSignUpSerializer, UserSignInSerializer,UserProfileSerializer,UserPasswordUpdateSerializer,GetUserProfileSerializer,UserRemoveSerializer,ForgotpasswordSerializer,SetPasswordSerializer,GetUserListSerializer,FCMTokenSerializer,ProfilePhotoSerializer
 from base.authentication import CustomAuthentication
 # import logging
 
@@ -263,4 +263,26 @@ class ManageUser(BaseAPIView):
 
         fcm_serializer.save()
         response = helper.getPositiveResponse("")
+        return Response(response, status=response['statusCode'])
+
+class SaveProfilePhoto(BaseAPIView):
+    authentication_classes = (CustomAuthentication, JSONWebTokenAuthentication)
+
+    def post(self, request):
+        try:
+            print('request data..')
+            print(request.data)
+            profile_photo_serialzer = ProfilePhotoSerializer(request.user, data=request.data)
+            print('in serializeer...')
+            print(profile_photo_serialzer)
+            if profile_photo_serialzer.is_valid() == False:
+                response = self.getErrorResponse(profile_photo_serialzer, status.HTTP_400_BAD_REQUEST)
+                return Response(response, status=response['statusCode'])
+            user = profile_photo_serialzer.save()
+            response = helper.getPositiveResponse("Profile updated successfully", user.profile.profile_photo.url)
+        except rest_serializer.ValidationError as exp:
+            response = self.getValidationErrorMessage(exp.detail, status.HTTP_400_BAD_REQUEST)
+        except:
+            response = helper.getNegativeResponse("Profile update failed", status.HTTP_500_INTERNAL_SERVER_ERROR)
+
         return Response(response, status=response['statusCode'])

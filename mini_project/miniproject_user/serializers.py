@@ -181,10 +181,17 @@ class GetUserProfileSerializer(BaseSerializer):
     mobile_number = miniproject_base_serializer.CharField(source='get_phone')
     business_address = miniproject_base_serializer.CharField(source='get_business_address')
     user_role = miniproject_base_serializer.CharField(source='get_user_role')
+    profile_photo = serializers.SerializerMethodField()
 
     class Meta:
         model = User
-        fields = ('userId','mobile_number','photo','business_name','business_address','username','user_role')
+        fields = ('userId','mobile_number','photo','business_name','business_address','username','user_role','profile_photo')
+    
+    def get_profile_photo(self, obj):
+        if obj.profile_photo:
+            return obj.profile_photo.url
+        else:
+            return ''       
 
 class UserPasswordUpdateSerializer(BasePlainSerializer):
     oldPassword = miniproject_base_serializer.CharField(min_length=5, max_length=35,required=True,allow_blank=False, error_messages={
@@ -206,8 +213,6 @@ class UserPasswordUpdateSerializer(BasePlainSerializer):
         'blank': 'Confirmation password may not be blank',
         'blank_code' : 300
     })
-
-
 
 class UserRemoveSerializer(BasePlainSerializer):
     user_id = miniproject_base_serializer.CharField(required=True,error_messages={
@@ -269,5 +274,21 @@ class FCMTokenSerializer(BasePlainSerializer):
             user.fcm_token.append(fcm_token)            
             user.save()
             
+        return user
+
+class ProfilePhotoSerializer(BaseSerializer):
+    profile_photo = miniproject_base_serializer.ImageField()
+
+    class Meta:
+        model=User
+        fields=('profile_photo',)
+
+    def update(self, instance, validated_data):
+        print('in update methodf...')
+        print(instance)
+        print(validated_data)
+        user = instance
+        user.profile_photo = validated_data.pop('profile_photo')
+        user.save()
         return user
 

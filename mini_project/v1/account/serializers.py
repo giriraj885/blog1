@@ -86,7 +86,7 @@ class GetCreditDetailSerializer(BaseSerializer):
         return accountmanagement.price
 
     def get_debit(self, accountmanagement):
-        return ''
+        return '-'
 
     def get_credit_user_id(self, accountmanagement):
         return accountmanagement.credit_user.id
@@ -114,7 +114,7 @@ class GetDebitDetailSerializer(BaseSerializer):
         fields = ('note','debit_user_id','credit','debit','credit_date','debit_date','credit_user_id','total_balance')
 
     def get_credit(self, accountmanagement):
-        return ''
+        return '-'
 
     def get_debit(self, accountmanagement):
         return accountmanagement.price
