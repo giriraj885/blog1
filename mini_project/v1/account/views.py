@@ -9,6 +9,7 @@ from v1.account.serializers import ManageAccountSerializer,GetCreditDetailSerial
 from base.authentication import CustomAuthentication
 from v1.account.models import AccountManagement
 from base import constants
+from django.db.models import Q
 
 class ManageAccount(BaseAPIView):
     authentication_classes = (CustomAuthentication, JSONWebTokenAuthentication)
@@ -32,37 +33,40 @@ class ManageAccount(BaseAPIView):
             "records": [],
             "items_per_page": records_per_page
         }
-        context = {'user': request.user.id}
+        context = {'user': request.user}
 
-        credit_user_list = AccountManagement.objects.filter(credit_user=request.user)
-        debit_user_list = AccountManagement.objects.filter(debit_user=request.user)
-        print(debit_user_list)
-        if credit_user_list:
-            print('in credit')
-            paginated_response = self.get_paginated_records(request, credit_user_list)
-            print(paginated_response)
-            credit_debit_serializer = GetCreditDetailSerializer(paginated_response['records'],context=context, many=True)
-            paginated_response['records'] = credit_debit_serializer.data
-            paginated_response['items_per_page'] = records_per_page
-            response = helper.getPositiveResponse('', paginated_response)
-            return Response(response)
+        credit_user_list = AccountManagement.objects.filter(
+            Q(credit_user=request.user) |
+            Q(debit_user=request.user)
+        )
+        # debit_user_list = AccountManagement.objects.filter(debit_user=request.user)
+        # print(debit_user_list)
+        # if credit_user_list:
+        print('in credit')
+        paginated_response = self.get_paginated_records(request, credit_user_list)
+        print(paginated_response)
+        credit_debit_serializer = GetCreditDetailSerializer(paginated_response['records'],context=context, many=True)
+        paginated_response['records'] = credit_debit_serializer.data
+        paginated_response['items_per_page'] = records_per_page
+        response = helper.getPositiveResponse('', paginated_response)
+        return Response(response)
 
-        if debit_user_list:
-            print('in debit')
-            paginated_response = self.get_paginated_records(request, debit_user_list)
-            print(paginated_response)
-            credit_debit_serializer = GetDebitDetailSerializer(paginated_response['records'],context=context, many=True)
-            print('in out...')
-            print(paginated_response['records'])
-            paginated_response['records'] = credit_debit_serializer.data
-            paginated_response['items_per_page'] = records_per_page
-            response = helper.getPositiveResponse('', paginated_response)
-            return Response(response)
+        # if debit_user_list:
+        #     print('in debit')
+        #     paginated_response = self.get_paginated_records(request, debit_user_list)
+        #     print(paginated_response)
+        #     credit_debit_serializer = GetDebitDetailSerializer(paginated_response['records'],context=context, many=True)
+        #     print('in out...')
+        #     print(paginated_response['records'])
+        #     paginated_response['records'] = credit_debit_serializer.data
+        #     paginated_response['items_per_page'] = records_per_page
+        #     response = helper.getPositiveResponse('', paginated_response)
+        #     return Response(response)
 
-        if credit_user_list.count() == 0:
-            response = helper.getPositiveResponse('No Credit Found', paginated_response)
-            return Response(response)
+        # if credit_user_list.count() == 0:
+        #     response = helper.getPositiveResponse('No Credit Found', paginated_response)
+        #     return Response(response)
 
-        if debit_user_list.count() == 0:
-            response = helper.getPositiveResponse('No Debit found', paginated_response)
-            return Response(response)
+        # if debit_user_list.count() == 0:
+        #     response = helper.getPositiveResponse('No Debit found', paginated_response)
+        #     return Response(response)
