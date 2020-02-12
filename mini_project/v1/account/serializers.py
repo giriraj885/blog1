@@ -2,7 +2,7 @@ from rest_framework import generics, status, serializers
 from miniproject_user.models import User
 from base.serializers import BaseSerializer,BasePlainSerializer
 from mini_project_serializer import miniproject_base_serializer
-from v1.account.models import AccountManagement
+from v1.account.models import AccountManagement,BankDetails
 from services.firebase import fb_service
 from base import helper,constants
 
@@ -159,3 +159,71 @@ class GetDebitDetailSerializer(BaseSerializer):
 
     def get_total_balance(self, accountmanagement):
         return 0
+
+class ManageBankSerializer(BaseSerializer):
+    bank_name = miniproject_base_serializer.CharField(required=True, error_messages={
+        'required': 'Bank name is required',
+        'invalid' : 'Invalid bank name',
+        'blank': 'Bank name may not be blank',
+        'blank_code' : 300,
+        'invalid' : 'Invalid bank name',
+        'invalid_code' : 500
+    })
+
+    bank_account_number = miniproject_base_serializer.CharField(required=True, error_messages={
+        'required': 'Bank account number is required',
+        'invalid' : 'Invalid bank account number',
+        'blank': 'Bank account number may not be blank',
+        'blank_code' : 300,
+        'invalid' : 'Invalid bank account number',
+        'invalid_code' : 500
+    })
+
+    ifac_code = miniproject_base_serializer.CharField(required=True, error_messages={
+        'required': 'Ifac code is required',
+        'invalid' : 'Invalid ifac code',
+        'blank': 'Ifac code may not be blank',
+        'blank_code' : 300,
+        'invalid' : 'Invalid ifac code',
+        'invalid_code' : 500
+    })
+
+    branch_name = miniproject_base_serializer.CharField(required=True, error_messages={
+        'required': 'Branch name is required',
+        'invalid' : 'Invalid branch name',
+        'blank': 'Branch name may not be blank',
+        'blank_code' : 300,
+        'invalid' : 'Invalid branch name',
+        'invalid_code' : 500
+    })
+
+    bank_location = miniproject_base_serializer.CharField(required=True, error_messages={
+        'required': 'Bank location is required',
+        'invalid' : 'Invalid bank location',
+        'blank': 'Bank location may not be blank',
+        'blank_code' : 300,
+        'invalid' : 'Invalid bank location',
+        'invalid_code' : 500
+    })
+
+    class Meta:
+        model = BankDetails
+        fields = ('bank_name','bank_account_number','ifac_code','branch_name','bank_location')
+
+    def create(self, validated_data):
+        bank_details = BankDetails(
+            user = validated_data['user'],
+            bank_name=validated_data['bank_name'],
+            bank_account_number=validated_data['bank_account_number'],
+            ifac_code=validated_data['ifac_code'],
+            branch_name=validated_data['branch_name'],
+            bank_location=validated_data['bank_location']
+        )
+        bank_details.save()
+        return validated_data
+
+class GetBankdetailSerializer(BaseSerializer):
+    bank_id = miniproject_base_serializer.CharField(source='get_bank_id')
+    class Meta:
+        model = BankDetails
+        fields = ('bank_id','bank_name','bank_account_number','ifac_code','branch_name','bank_location')

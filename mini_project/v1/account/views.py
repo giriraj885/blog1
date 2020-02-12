@@ -5,9 +5,10 @@ from rest_framework_jwt.authentication import JSONWebTokenAuthentication
 from otslib.utils import helper
 from rest_framework import serializers as rest_serializer
 from base.views import BaseAPIView
-from v1.account.serializers import ManageAccountSerializer,GetCreditDetailSerializer,GetDebitDetailSerializer
+from v1.account.serializers import ManageAccountSerializer,GetCreditDetailSerializer,GetDebitDetailSerializer,ManageBankSerializer,GetBankdetailSerializer
 from base.authentication import CustomAuthentication
-from v1.account.models import AccountManagement
+from v1.account.models import AccountManagement,BankDetails
+from rest_framework.serializers import ValidationError 
 from base import constants
 from django.db.models import Q
 
@@ -70,3 +71,36 @@ class ManageAccount(BaseAPIView):
         # if debit_user_list.count() == 0:
         #     response = helper.getPositiveResponse('No Debit found', paginated_response)
         #     return Response(response)
+
+
+class ManageBankDetails(BaseAPIView):
+    authentication_classes = (CustomAuthentication, JSONWebTokenAuthentication)
+
+    def post(self, request):
+        manage_bank_serializer = ManageBankSerializer(data=request.data)
+        manage_bank_serializer.is_valid(raise_exception=True)
+        validated_data = manage_bank_serializer.validated_data
+        validated_data['user'] = request.user
+        manage_bank_serializer.save()
+        response = helper.getPositiveResponse("bank detail save successfully")
+        return Response(response)
+    
+    def get(self, request):
+        bank_detail_list = BankDetails.objects.filter(user=request.user)
+        bank_detail_serializer = GetBankdetailSerializer(bank_detail_list, many=True)
+        response = helper.getPositiveResponse("Retrieved bank detail", bank_detail_serializer.data)
+        return Response(response)
+
+    def delete(self, request):
+        if 'bank_id' not in request.data:
+            raise ValidationError('bank id is require')
+        try:
+            bank_detail = BankDetails.objects.get(id=request.data['bank_id'])
+            bank_detail.delete()
+            # bank_detail.save()
+            response = helper.getPositiveResponse("bank id is delete successfully")
+            return Response(response)
+        except BankDetails.DoesNotExist:
+            raise ValidationError('bank id is alredy deleted')
+
+        

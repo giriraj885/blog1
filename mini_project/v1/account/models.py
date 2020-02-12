@@ -18,5 +18,18 @@ class AccountManagement(BaseModel):
 
     def get_debit_user_date(self):
         return helper.datetimeToStringDateTime(self.created_date_time, constants.DATE_FORMAT)
+
+class BankDetails(BaseModel):
+    class Meta:
+        db_table = 'bankdetails'
     
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    bank_name = models.CharField(max_length=255,default='')
+    bank_account_number = models.CharField(max_length=255,default='')
+    ifac_code = models.CharField(max_length=255,default='')
+    branch_name = models.CharField(max_length=255,default='')
+    bank_location = models.CharField(max_length=255,default='')
+
+    def get_bank_id(self):
+        return self.id
     
