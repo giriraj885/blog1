@@ -44,7 +44,6 @@ class ManageAccountSerializer(BaseSerializer):
             user = User.objects.get(id = validated_data['user_id'])
         except User.DoesNotExist:
             raise serializers.ValidationError('Invalid user id')
-
         account_management = AccountManagement(
             price = validated_data['price'],
             current_time = validated_data['current_time'],
