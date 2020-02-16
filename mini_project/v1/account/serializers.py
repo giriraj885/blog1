@@ -72,8 +72,9 @@ class ManageAccountSerializer(BaseSerializer):
 class GetCreditDetailSerializer(BaseSerializer):
     credit = miniproject_base_serializer.SerializerMethodField()
     debit = miniproject_base_serializer.SerializerMethodField()
-    credit_date = miniproject_base_serializer.SerializerMethodField()
-    debit_date = miniproject_base_serializer.SerializerMethodField()
+    # credit_date = miniproject_base_serializer.SerializerMethodField()
+    # debit_date = miniproject_base_serializer.SerializerMethodField()
+    created_date = miniproject_base_serializer.SerializerMethodField()
     credit_user_id = miniproject_base_serializer.SerializerMethodField()
     debit_user_id =miniproject_base_serializer.SerializerMethodField()
     total_balance = miniproject_base_serializer.SerializerMethodField()
@@ -81,28 +82,39 @@ class GetCreditDetailSerializer(BaseSerializer):
 
     class Meta:
         model = AccountManagement
-        fields = ('note','debit_user_id','credit','debit','credit_date','debit_date','credit_user_id','total_balance','credit_user_company_name')
+        fields = ('note','debit_user_id','credit','debit','credit_user_id','created_date','total_balance','credit_user_company_name')
 
     def get_credit_user_company_name(self, accountmanagement):
-        if 'user' in self.context and self.context['user'].id == accountmanagement.credit_user.id:
+        if 'user' in self.context and int(self.context['user']) == accountmanagement.credit_user.id:
             return accountmanagement.credit_user.business_name
         else:
             return accountmanagement.credit_user.business_name
 
     def get_credit(self, accountmanagement):
-        if 'user' in self.context and self.context['user'].id == accountmanagement.credit_user.id:
+        print(type(self.context['user']))
+        print(type(accountmanagement.debit_user.id))
+        print('test..')
+        if 'user' in self.context and int(self.context['user']) == accountmanagement.credit_user.id:
             return accountmanagement.price
         else:
             return '-'
 
-    def get_credit_date(self,accountmanagement):
-        if 'user' in self.context and self.context['user'].id == accountmanagement.credit_user.id:
+    def get_created_date(self,accountmanagement):
+        if 'user' in self.context and int(self.context['user']) == accountmanagement.credit_user.id:
             return helper.datetimeToStringDateTime(accountmanagement.created_date_time, constants.DATE_FORMAT)
         else:
-            return ''
+            return helper.datetimeToStringDateTime(accountmanagement.created_date_time, constants.DATE_FORMAT)
+
+    # def get_credit_date(self,accountmanagement):
+    #     if 'user' in self.context and int(self.context['user']) == accountmanagement.credit_user.id:
+    #         return helper.datetimeToStringDateTime(accountmanagement.created_date_time, constants.DATE_FORMAT)
+    #     else:
+    #         return ''
 
     def get_debit(self, accountmanagement):
-        if 'user' in self.context and self.context['user'].id == accountmanagement.debit_user.id:
+        # print(int(self.context['user']))
+        # print(accountmanagement.debit_user.id)
+        if 'user' in self.context and int(self.context['user']) == accountmanagement.debit_user.id:
             return accountmanagement.price
         else:
             return '-'
@@ -113,17 +125,17 @@ class GetCreditDetailSerializer(BaseSerializer):
     def get_debit_user_id(self, accountmanagement):
         return accountmanagement.debit_user.id
 
-    def get_debit_date(self, accountmanagement):
-        if 'user' in self.context and self.context['user'].id == accountmanagement.debit_user.id:
-            return helper.datetimeToStringDateTime(accountmanagement.created_date_time, constants.DATE_FORMAT)
-        else:
-            return ''
+    # def get_debit_date(self, accountmanagement):
+    #     if 'user' in self.context and int(self.context['user']) == accountmanagement.debit_user.id:
+    #         return helper.datetimeToStringDateTime(accountmanagement.created_date_time, constants.DATE_FORMAT)
+    #     else:
+    #         return ''
 
 
     def get_total_balance(self, accountmanagement):
-        if 'user' in self.context and self.context['user'].id == accountmanagement.credit_user.id:
+        if 'user' in self.context and int(self.context['user']) == accountmanagement.credit_user.id:
             return accountmanagement.price
-        elif 'user' in self.context and self.context['user'].id == accountmanagement.debit_user.id:
+        elif 'user' in self.context and int(self.context['user']) == accountmanagement.debit_user.id:
             total = accountmanagement.price +accountmanagement.price
             return accountmanagement.price - total
         
