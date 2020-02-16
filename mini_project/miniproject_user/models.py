@@ -101,6 +101,13 @@ class User(AbstractBaseUser,BaseModel):
             return 'Owner'
     def get_business_photo(self):
         return constants.NO_USER_IMAGE
+
+    def get_push_token(self):
+        if self.fcm_token:
+            return self.fcm_token[-1]
+        else:
+            ''
+
 class BlackList(BaseModel):
     class Meta:
         db_table = 'blacklist'
