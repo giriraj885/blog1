@@ -10,6 +10,7 @@ FIREBASE_ADMIN_SDK = 'services/firebase/fire_base_notification.json'
 cred = credentials.Certificate(FIREBASE_ADMIN_SDK)
 default_app = firebase_admin.initialize_app(cred)
 def sendNotification(title, body, data, token):
+    print(token)
     """
     @desc: Send notification
     @param: data (dictionary)
@@ -32,6 +33,7 @@ def sendNotification(title, body, data, token):
             webpush=web_push_config
         )
         message_id = firebase_admin.messaging.send(message)
+        print(message_id)
         return helper.getPositiveResponse("Message send successfully",message_id)
     except Exception as e:
         return helper.getNegativeResponse("Message send failed")
