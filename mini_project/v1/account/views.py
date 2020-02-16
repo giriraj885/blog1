@@ -34,12 +34,15 @@ class ManageAccount(BaseAPIView):
             "records": [],
             "items_per_page": records_per_page
         }
-        context = {'user': request.user}
+        
+        if 'user_id' not in request.GET:
+            raise ValidationError('user id is require')
 
         credit_user_list = AccountManagement.objects.filter(
-            Q(credit_user=request.user) |
-            Q(debit_user=request.user)
+            Q(credit_user=request.user,debit_user__id=request.GET['user_id']) |
+            Q(debit_user=request.user,credit_user__id=request.GET['user_id'])
         )
+        context = {'user': request.GET['user_id']}
         # debit_user_list = AccountManagement.objects.filter(debit_user=request.user)
         # print(debit_user_list)
         # if credit_user_list:
