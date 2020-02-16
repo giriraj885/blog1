@@ -8,6 +8,10 @@ from base import helper
 import  time, datetime
 import uuid
 from datetime import timedelta
+from PIL import Image
+import requests
+from urllib.request import urlopen
+from io import BytesIO
 
 class UserSignInSerializer(BasePlainSerializer):
     mobile_number = miniproject_base_serializer.CharField(required=True, error_messages={
@@ -181,17 +185,38 @@ class GetUserProfileSerializer(BaseSerializer):
     mobile_number = miniproject_base_serializer.CharField(source='get_phone')
     business_address = miniproject_base_serializer.CharField(source='get_business_address')
     user_role = miniproject_base_serializer.CharField(source='get_user_role')
-    profile_photo = serializers.SerializerMethodField()
+    # profile_photo = serializers.SerializerMethodField()
+    demo_photo = miniproject_base_serializer.SerializerMethodField()
 
     class Meta:
         model = User
-        fields = ('userId','mobile_number','photo','business_name','business_address','username','user_role','profile_photo')
-    
-    def get_profile_photo(self, obj):
-        if obj.profile_photo:
-            return obj.profile_photo.url
-        else:
-            return ''       
+        fields = ('userId','mobile_number','photo','business_name','business_address','username','user_role','demo_photo')
+
+    def get_demo_photo(self, obj):
+        # response = requests.get(url)
+        print('........')
+        print(obj.profile_photo)
+        print(obj.profile_photo.url)
+        print(Image.open(urlopen(obj.profile_photo.url)))
+        # img = Image.open(BytesIO(obj.profile_photo))
+        # print(img)
+
+        # if obj.profile_photo:
+        #     return obj.profile_photo.url
+        # else:
+        return ''       
+
+
+    # def get_profile_photo(self, obj):
+    #     # response = requests.get(url)
+    #     print('........')
+    #     print(obj.profile_photo)
+    #     img = Image.open(BytesIO(response.content))
+
+    #     # if obj.profile_photo:
+    #     #     return obj.profile_photo.url
+    #     # else:
+    #     return ''       
 
 class UserPasswordUpdateSerializer(BasePlainSerializer):
     oldPassword = miniproject_base_serializer.CharField(min_length=5, max_length=35,required=True,allow_blank=False, error_messages={
@@ -253,12 +278,13 @@ class GetUserListSerializer(BaseSerializer):
     userId = miniproject_base_serializer.CharField(source='get_user_id')
     mobile_number = miniproject_base_serializer.CharField(source='get_phone')
     business_address = miniproject_base_serializer.CharField(source='get_business_address')
-    user_role = miniproject_base_serializer.CharField(source='get_user_role')
+    # user_role = miniproject_base_serializer.CharField(source='get_user_role')
     business_photo = miniproject_base_serializer.CharField(source='get_business_photo')
+    push_token = miniproject_base_serializer.CharField(source='get_push_token')
 
     class Meta:
         model = User
-        fields = ('userId','mobile_number','photo','business_name','business_address','username','user_type','user_role','business_photo')
+        fields = ('userId','mobile_number','business_name','business_address','business_photo','push_token')
 
 class FCMTokenSerializer(BasePlainSerializer):
     fcm_token = miniproject_base_serializer.CharField(required=False, allow_blank=True,default='', error_messages={
@@ -270,9 +296,11 @@ class FCMTokenSerializer(BasePlainSerializer):
         user = instance
         fcm_token = validated_data['fcm_token']
 
-        if fcm_token not in user.fcm_token:
-            user.fcm_token.append(fcm_token)            
-            user.save()
+        # if fcm_token not in user.fcm_token:
+        user.fcm_token=[]
+        user.save()
+        user.fcm_token.append(fcm_token)            
+        user.save()
             
         return user
 

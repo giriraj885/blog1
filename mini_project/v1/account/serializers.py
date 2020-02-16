@@ -77,13 +77,16 @@ class GetCreditDetailSerializer(BaseSerializer):
     # debit_date = miniproject_base_serializer.SerializerMethodField()
     created_date = miniproject_base_serializer.SerializerMethodField()
     credit_user_id = miniproject_base_serializer.SerializerMethodField()
-    debit_user_id =miniproject_base_serializer.SerializerMethodField()
+    other_user_id =miniproject_base_serializer.SerializerMethodField()
+    other_business_name=miniproject_base_serializer.SerializerMethodField()
+    other_business_address=miniproject_base_serializer.SerializerMethodField()
+    other_business_photo=miniproject_base_serializer.SerializerMethodField()
     total_balance = miniproject_base_serializer.SerializerMethodField()
     credit_user_company_name = miniproject_base_serializer.SerializerMethodField()
 
     class Meta:
         model = AccountManagement
-        fields = ('note','debit_user_id','credit','debit','credit_user_id','created_date','total_balance','credit_user_company_name')
+        fields = ('note','credit','debit','credit_user_id','created_date','total_balance','credit_user_company_name','other_user_id','other_business_name','other_business_address','other_business_photo')
 
     def get_credit_user_company_name(self, accountmanagement):
         if 'user' in self.context and int(self.context['user']) == accountmanagement.credit_user.id:
@@ -92,10 +95,7 @@ class GetCreditDetailSerializer(BaseSerializer):
             return accountmanagement.credit_user.business_name
 
     def get_credit(self, accountmanagement):
-        print(type(self.context['user']))
-        print(type(accountmanagement.debit_user.id))
-        print('test..')
-        if 'user' in self.context and int(self.context['user']) == accountmanagement.credit_user.id:
+        if 'user' in self.context and int(self.context['user']) == accountmanagement.debit_user.id:
             return accountmanagement.price
         else:
             return '-'
@@ -113,9 +113,7 @@ class GetCreditDetailSerializer(BaseSerializer):
     #         return ''
 
     def get_debit(self, accountmanagement):
-        # print(int(self.context['user']))
-        # print(accountmanagement.debit_user.id)
-        if 'user' in self.context and int(self.context['user']) == accountmanagement.debit_user.id:
+        if 'user' in self.context and int(self.context['user']) == accountmanagement.credit_user.id:
             return accountmanagement.price
         else:
             return '-'
@@ -123,8 +121,18 @@ class GetCreditDetailSerializer(BaseSerializer):
     def get_credit_user_id(self, accountmanagement):
         return accountmanagement.credit_user.id
 
-    def get_debit_user_id(self, accountmanagement):
+    def get_other_user_id(self, accountmanagement):
         return accountmanagement.debit_user.id
+
+    def get_other_business_name(self, accountmanagement):
+        return accountmanagement.debit_user.business_name
+
+    def get_other_business_address(self, accountmanagement):
+        return accountmanagement.debit_user.address
+
+    def get_other_business_photo(self, accountmanagement):
+        return constants.NO_USER_IMAGE
+
 
     # def get_debit_date(self, accountmanagement):
     #     if 'user' in self.context and int(self.context['user']) == accountmanagement.debit_user.id:
@@ -134,9 +142,9 @@ class GetCreditDetailSerializer(BaseSerializer):
 
 
     def get_total_balance(self, accountmanagement):
-        if 'user' in self.context and int(self.context['user']) == accountmanagement.credit_user.id:
+        if 'user' in self.context and int(self.context['user']) == accountmanagement.debit_user.id:
             return accountmanagement.price
-        elif 'user' in self.context and int(self.context['user']) == accountmanagement.debit_user.id:
+        elif 'user' in self.context and int(self.context['user']) == accountmanagement.credit_user.id:
             total = accountmanagement.price +accountmanagement.price
             return accountmanagement.price - total
         
