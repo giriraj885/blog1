@@ -80,12 +80,13 @@ class GetCreditDetailSerializer(BaseSerializer):
     other_business_name=miniproject_base_serializer.SerializerMethodField()
     other_business_address=miniproject_base_serializer.SerializerMethodField()
     other_business_photo=miniproject_base_serializer.SerializerMethodField()
+    other_mobile_no = miniproject_base_serializer.SerializerMethodField()
     total_balance = miniproject_base_serializer.SerializerMethodField()
     credit_user_company_name = miniproject_base_serializer.SerializerMethodField()
 
     class Meta:
         model = AccountManagement
-        fields = ('note','credit','debit','credit_user_id','created_date','total_balance','credit_user_company_name','other_user_id','other_business_name','other_business_address','other_business_photo')
+        fields = ('note','credit','debit','credit_user_id','created_date','total_balance','credit_user_company_name','other_user_id','other_business_name','other_business_address','other_business_photo','other_mobile_no')
 
     def get_credit_user_company_name(self, accountmanagement):
         if 'user' in self.context and int(self.context['user']) == accountmanagement.credit_user.id:
@@ -132,6 +133,8 @@ class GetCreditDetailSerializer(BaseSerializer):
     def get_other_business_photo(self, accountmanagement):
         return constants.NO_USER_IMAGE
 
+    def get_other_mobile_no(self, accountmanagement):
+        return accountmanagement.debit_user.phone
 
     # def get_debit_date(self, accountmanagement):
     #     if 'user' in self.context and int(self.context['user']) == accountmanagement.debit_user.id:
