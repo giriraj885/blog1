@@ -6,12 +6,29 @@ from base import constants, helper
 from django.contrib.postgres.fields import ArrayField
 import os
 
+# def wrapper(instance, filename):
+#     filename = '{}.{}'.format(str(instance.pk) + '_' + helper.randomGeneratorCode(), 'jpg')        
+#     return os.path.join('profile_photos', filename)
+
+# def path_and_rename():
+#     return wrapper
+
+
 def wrapper(instance, filename):
-    filename = '{}.{}'.format(str(instance.pk) + '_' + helper.randomGeneratorCode(), 'jpg')        
-    return os.path.join('profile_photos', filename)
+    filetypes = filename.split('.')
+    filename = '{}.{}'.format(str(helper.randomString()),filetypes[len(filetypes)-1].lower())
+    return os.path.join('static', filename)
 
 def path_and_rename():
     return wrapper
+
+
+def validate_file_extension(filename):
+    ext = os.path.splitext(filename.name)[1]
+    valid_extensions = ['.jpg','.jpeg','.png','.mpeg','.3gp','.mp4','.svg','.mkv','.avi']
+    if not ext.lower() in valid_extensions:
+        raise ValidationError('File type ' + ext + " is not supported.")
+
 
 
 class UserPermission(BaseModel):
@@ -80,7 +97,8 @@ class User(AbstractBaseUser,BaseModel):
     permissions = models.ForeignKey(UserPermission, on_delete=models.CASCADE)
     user_type = models.IntegerField(default=2)
     fcm_token = ArrayField(models.TextField(default=""),default=[])
-    profile_photo =	models.ImageField(upload_to=path_and_rename(), blank=True, null=True, default='')
+    # profile_photo =	models.ImageField(upload_to=path_and_rename(), blank=True, null=True, default='')
+    profile_photo =	models.FileField(upload_to=path_and_rename(),validators=[validate_file_extension])
     USERNAME_FIELD = 'phone'
         
     def get_user_id(self):

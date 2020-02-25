@@ -7,13 +7,14 @@ from rest_framework.views import APIView
 from otslib.utils import helper
 from django.db.models import Q
 from base import constants
-from rest_framework.parsers import FormParser, JSONParser
+from rest_framework.parsers import FormParser, JSONParser,MultiPartParser,FileUploadParser
 from rest_framework import serializers as rest_serializer
 from rest_framework.serializers import ValidationError 
 from base.views import BaseAPIView
 from miniproject_user.models import User,BlackList,UserVerification
 from miniproject_user.serializers import UserSignUpSerializer, UserSignInSerializer,UserProfileSerializer,UserPasswordUpdateSerializer,GetUserProfileSerializer,UserRemoveSerializer,ForgotpasswordSerializer,SetPasswordSerializer,GetUserListSerializer,FCMTokenSerializer,ProfilePhotoSerializer
 from base.authentication import CustomAuthentication
+from PIL import Image
 # import logging
 
 class SignUp(BaseAPIView):
@@ -65,6 +66,7 @@ class UserProfileUpdate(BaseAPIView):
 
     def get(self,request):
         user_profile_serializer = GetUserProfileSerializer(request.user)
+        print(user_profile_serializer)
         response = helper.getPositiveResponse("Retrieved profile", user_profile_serializer.data)
         # response = get_response("Retrieved profile", BaseAPIView.PASS_RESPONSE_STATUS,BaseAPIView.SUCCESS_CODE,user_profile_serializer.data)
         return Response(response)
@@ -267,22 +269,43 @@ class ManageUser(BaseAPIView):
 
 class SaveProfilePhoto(BaseAPIView):
     authentication_classes = (CustomAuthentication, JSONWebTokenAuthentication)
+    parser_class = (FileUploadParser,)
 
     def post(self, request):
-        try:
-            print('request data..')
-            print(request.data)
-            profile_photo_serialzer = ProfilePhotoSerializer(request.user, data=request.data)
-            print('in serializeer...')
-            print(profile_photo_serialzer)
-            if profile_photo_serialzer.is_valid() == False:
-                response = self.getErrorResponse(profile_photo_serialzer, status.HTTP_400_BAD_REQUEST)
-                return Response(response, status=response['statusCode'])
-            user = profile_photo_serialzer.save()
-            response = helper.getPositiveResponse("Profile updated successfully", user.profile.profile_photo.url)
-        except rest_serializer.ValidationError as exp:
-            response = self.getValidationErrorMessage(exp.detail, status.HTTP_400_BAD_REQUEST)
-        except:
-            response = helper.getNegativeResponse("Profile update failed", status.HTTP_500_INTERNAL_SERVER_ERROR)
+        if 'business_photo' not in request.data:
+            response = helper.getNegativeResponse('business photo is require')
+            return Response(response, status=response['statusCode'])
+            # raise ParseError("Empty content")
 
-        return Response(response, status=response['statusCode'])
+        f = request.data['business_photo']
+
+        try:
+            img = Image.open(f)
+            img.verify()
+        except:
+            response = helper.getNegativeResponse('Unsupported image type')
+            return Response(response, status=response['statusCode'])
+            # raise ParseError("Unsupported image type")
+       
+        request.user.profile_photo = f
+        request.user.save()
+       
+        response = helper.getPositiveResponse("Profile updated successfully")
+        return Response(response, status=200)
+        # try:
+        #     print('request data..')
+        #     print(request.data)
+        #     profile_photo_serialzer = ProfilePhotoSerializer(request.user, data=request.data)
+        #     print('in serializeer...')
+        #     print(profile_photo_serialzer)
+        #     if profile_photo_serialzer.is_valid() == False:
+        #         response = self.getErrorResponse(profile_photo_serialzer, status.HTTP_400_BAD_REQUEST)
+        #         return Response(response, status=response['statusCode'])
+        #     user = profile_photo_serialzer.save()
+        #     response = helper.getPositiveResponse("Profile updated successfully", user.profile.profile_photo.url)
+        # except rest_serializer.ValidationError as exp:
+        #     response = self.getValidationErrorMessage(exp.detail, status.HTTP_400_BAD_REQUEST)
+        # except:
+        #     response = helper.getNegativeResponse("Profile update failed", status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+        # return Response(response, status=response['statusCode'])
