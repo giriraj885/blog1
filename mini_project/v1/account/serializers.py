@@ -53,7 +53,7 @@ class ManageAccountSerializer(BaseSerializer):
         )
         account_management.save()
         message = validated_data['user'].business_name + ' is pay ' +  str(validated_data['price']) + 'rs.'
-        for token in validated_data['user'].fcm_token:
+        for token in user.fcm_token:
             fb_service.sendNotification(
                 message, 
                 '', 
