@@ -52,19 +52,20 @@ class ManageAccountSerializer(BaseSerializer):
             debit_user = validated_data['user']
         )
         account_management.save()
-        message = "Hello"
-        for token in user.fcm_token:
+        message = validated_data['user'].business_name + ' is pay ' +  str(validated_data['price']) + 'rs.'
+        for token in validated_data['user'].fcm_token:
             fb_service.sendNotification(
-                'New Message', 
-                message,
+                message, 
+                '', 
                 {   
                     'notification_type': 'chat', 
                     'last_timestamp': 'test',
-                    'receiver_id' : user.id,
-                    'sender_id' : validated_data['user'].id,
+                    'receiver_id' : str(user.id),
+                    'sender_id' : str(validated_data['user'].id),
                     'user_name' : validated_data['user'].username,
-                    'user_initial':'test'
-                }, 
+                    'user_initial':'test',
+                    'show_notification': 'true'
+                },
                 token
             )
         return account_management
