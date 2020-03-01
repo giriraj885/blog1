@@ -11,6 +11,7 @@ from datetime import timedelta
 from PIL import Image
 import requests
 from io import BytesIO
+from base import constants
 
 class UserSignInSerializer(BasePlainSerializer):
     mobile_number = miniproject_base_serializer.CharField(required=True, error_messages={
@@ -276,10 +277,14 @@ class GetUserListSerializer(BaseSerializer):
     # user_role = miniproject_base_serializer.CharField(source='get_user_role')
     business_photo = miniproject_base_serializer.CharField(source='get_business_photo')
     push_token = miniproject_base_serializer.CharField(source='get_push_token')
+    createdDate = miniproject_base_serializer.SerializerMethodField()
 
     class Meta:
         model = User
-        fields = ('userId','mobile_number','business_name','business_address','business_photo','push_token')
+        fields = ('userId','mobile_number','business_name','business_address','business_photo','push_token','createdDate')
+
+    def get_createdDate(self, user):
+        return helper.datetimeToStringDateTime(user.created_date_time, constants.DATE_FORMAT)
 
 class FCMTokenSerializer(BasePlainSerializer):
     fcm_token = miniproject_base_serializer.CharField(required=False, allow_blank=True,default='', error_messages={

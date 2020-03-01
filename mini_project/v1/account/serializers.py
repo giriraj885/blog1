@@ -58,7 +58,7 @@ class ManageAccountSerializer(BaseSerializer):
                 message, 
                 '', 
                 {   
-                    'notification_type': 'chat', 
+                    'notification_type': 'accountation', 
                     'last_timestamp': 'test',
                     'receiver_id' : str(user.id),
                     'sender_id' : str(validated_data['user'].id),

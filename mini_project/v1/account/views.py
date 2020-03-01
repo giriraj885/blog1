@@ -42,6 +42,10 @@ class ManageAccount(BaseAPIView):
             Q(credit_user=request.user,debit_user__id=request.GET['user_id']) |
             Q(debit_user=request.user,credit_user__id=request.GET['user_id'])
         )
+
+        if 'currentMonth' in request.GET and 'currentYear' in request.GET:
+            credit_user_list = credit_user_list.filter(current_time__year=request.GET['currentYear']).filter(current_time__month=request.GET['currentMonth'])
+
         context = {'user': request.GET['user_id']}
         # debit_user_list = AccountManagement.objects.filter(debit_user=request.user)
         # print(debit_user_list)
