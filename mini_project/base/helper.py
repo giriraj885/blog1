@@ -18,3 +18,7 @@ def randomGeneratorCode(size=6, chars=string.ascii_uppercase + string.digits):
 
 def datetimeToStringDateTime(date, format):
     return date.strftime(format)
+
+def randomString():
+    string = datetime.now()
+    return string.strftime("%Y" "%m" "%d" "%H" "%M" "%S" "%m") + str(random.randint(1000,9999))

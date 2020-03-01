@@ -196,10 +196,10 @@ class GetUserProfileSerializer(BaseSerializer):
         # img = Image.open(BytesIO(obj.profile_photo))
         # print(img)
 
-        # if obj.profile_photo:
-        #     return obj.profile_photo.url
-        # else:
-        return ''       
+        if obj.profile_photo:
+            return obj.profile_photo.url
+        else:
+            return ''
 
 
     # def get_profile_photo(self, obj):
@@ -300,18 +300,15 @@ class FCMTokenSerializer(BasePlainSerializer):
         return user
 
 class ProfilePhotoSerializer(BaseSerializer):
-    profile_photo = miniproject_base_serializer.ImageField()
+    business_photo = serializers.FileField(required=False)
 
     class Meta:
         model=User
-        fields=('profile_photo',)
+        fields=('business_photo',)
 
     def update(self, instance, validated_data):
-        print('in update methodf...')
-        print(instance)
-        print(validated_data)
         user = instance
-        user.profile_photo = validated_data.pop('profile_photo')
+        user.profile_photo = validated_data['business_photo']
         user.save()
         return user
 
