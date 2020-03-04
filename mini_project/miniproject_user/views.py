@@ -15,6 +15,7 @@ from miniproject_user.models import User,BlackList,UserVerification
 from miniproject_user.serializers import UserSignUpSerializer, UserSignInSerializer,UserProfileSerializer,UserPasswordUpdateSerializer,GetUserProfileSerializer,UserRemoveSerializer,ForgotpasswordSerializer,SetPasswordSerializer,GetUserListSerializer,FCMTokenSerializer,ProfilePhotoSerializer
 from base.authentication import CustomAuthentication
 from PIL import Image
+from v1.account.models import AccountManagement
 # import logging
 
 class SignUp(BaseAPIView):
@@ -289,8 +290,8 @@ class SaveProfilePhoto(BaseAPIView):
        
         request.user.profile_photo = f
         request.user.save()
-       
-        response = helper.getPositiveResponse("Profile updated successfully")
+        data = {'business_photo':request.user.profile_photo.url}
+        response = helper.getPositiveResponse("Profile updated successfully",data)
         return Response(response, status=200)
         # try:
         #     print('request data..')
@@ -309,3 +310,61 @@ class SaveProfilePhoto(BaseAPIView):
         #     response = helper.getNegativeResponse("Profile update failed", status.HTTP_500_INTERNAL_SERVER_ERROR)
 
         # return Response(response, status=response['statusCode'])
+
+class GetAllUser(BaseAPIView):
+    authentication_classes = (CustomAuthentication, JSONWebTokenAuthentication)
+
+    def get(self, request):
+        user_per_page = constants.USER_PER_PAGE
+        total_pages = 0
+        page_start = 0
+        page_end = user_per_page
+        user_list = []
+        
+
+        credit_user_list = AccountManagement.objects.filter(
+            Q(credit_user=request.user),
+            ~Q(debit_user=request.user)
+        ).values_list('debit_user',flat=True).distinct('debit_user')
+
+        debit_user_list = AccountManagement.objects.filter(
+            ~Q(credit_user=request.user),
+            Q(debit_user=request.user)
+        ).values_list('credit_user',flat=True).distinct('credit_user')
+
+        user_list = User.objects.filter(
+            Q(id__in = credit_user_list)|
+            Q(id__in = debit_user_list)
+        )
+
+        if 'page_no' in request.GET and request.GET['page_no']!='0':
+            page_end = int(request.GET['page_no']) * user_per_page
+            page_start = page_end - user_per_page
+
+            user_list_serializer = GetUserListSerializer(
+            user_list[page_start:page_end], many=True,
+            ) 
+        else:
+            user_list_serializer = GetUserListSerializer(
+            user_list[page_start:page_end], many=True,
+            ) 
+
+        total_user = len(user_list)
+        if total_user!=0:
+            total_user_reminder = total_user%user_per_page
+            total_pages = int(total_user/user_per_page)
+            if total_user_reminder!=0:
+                total_pages += 1
+
+        response_data = {
+            "total_pages" : total_pages,
+            "total_user_count" : total_user,
+            "user_list" : user_list_serializer.data,
+            "items_per_page" : user_per_page
+        }
+
+        if len(response_data["user_list"]) == 0:
+            response = helper.getPositiveResponse("No user found", response_data)
+        else:    
+            response = helper.getPositiveResponse("", response_data)
+        return Response(response, status=response['statusCode'])
