@@ -14,5 +14,6 @@ urlpatterns = [
     url(r'^all', views.ManageUser.as_view(), name='get_all_user'),
     url(r'^token', views.ManageUser.as_view(), name='set_token'),
     url(r'^upload/photo', views.SaveProfilePhoto.as_view(), name='user_save_photo'),
+    url(r'^', views.GetAllUser.as_view(), name='get_account_all_user'),
     
 ]
