@@ -5,6 +5,7 @@ from mini_project_serializer import miniproject_base_serializer
 from v1.account.models import AccountManagement,BankDetails
 from services.firebase import fb_service
 from base import helper,constants
+from django.db.models import Q, Count, Case, When, Avg, Sum, IntegerField
 
 class ManageAccountSerializer(BaseSerializer):
     price = miniproject_base_serializer.IntegerField(required=True, error_messages={
@@ -146,11 +147,47 @@ class GetCreditDetailSerializer(BaseSerializer):
 
 
     def get_total_balance(self, accountmanagement):
+        account_list = AccountManagement.objects.filter(created_date_time__lte=accountmanagement.created_date_time)
         if 'user' in self.context and int(self.context['user']) == accountmanagement.debit_user.id:
-            return accountmanagement.price
+            account_list = account_list.aggregate(
+                total_debit_user_price = Sum(
+                    Case(
+                        When(debit_user=self.context['user'], then=accountmanagement.price),
+                        output_field=IntegerField(),
+                        default=0
+                        ),
+                    ),
+                total_credit_user_price =  Sum(
+                    Case(
+                        When(credit_user=self.context['user'], then=accountmanagement.price),
+                        output_field=IntegerField(),
+                        default=0
+                        ),
+                    ), 
+            )
+            total = account_list['total_credit_user_price'] + account_list['total_credit_user_price']
+            return account_list['total_credit_user_price'] - total - account_list['total_debit_user_price']
+          
+            # return accountmanagement.price
         elif 'user' in self.context and int(self.context['user']) == accountmanagement.credit_user.id:
-            total = accountmanagement.price +accountmanagement.price
-            return accountmanagement.price - total
+            account_list = account_list.aggregate(
+                total_debit_user_price = Sum(
+                    Case(
+                        When(debit_user=self.context['user'], then=accountmanagement.price),
+                        output_field=IntegerField(),
+                        default=0
+                        ),
+                    ),
+                total_credit_user_price =  Sum(
+                    Case(
+                        When(credit_user=self.context['user'], then=accountmanagement.price),
+                        output_field=IntegerField(),
+                        default=0
+                        ),
+                    ), 
+            )
+            total = account_list['total_credit_user_price'] + account_list['total_credit_user_price']
+            return account_list['total_credit_user_price'] - total
         
 
 class GetDebitDetailSerializer(BaseSerializer):
