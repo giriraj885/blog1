@@ -46,13 +46,13 @@ class ManageAccount(BaseAPIView):
         if 'currentMonth' in request.GET and 'currentYear' in request.GET:
             credit_user_list = credit_user_list.filter(current_time__year=request.GET['currentYear']).filter(current_time__month=request.GET['currentMonth'])
 
-        context = {'user': request.GET['user_id']}
+        context = {'user': request.GET['user_id'],'request_user':request.user}
         # debit_user_list = AccountManagement.objects.filter(debit_user=request.user)
         # print(debit_user_list)
         # if credit_user_list:
         print('in credit')
         paginated_response = self.get_paginated_records(request, credit_user_list)
-        print(paginated_response)
+        
         credit_debit_serializer = GetCreditDetailSerializer(paginated_response['records'],context=context, many=True)
         paginated_response['records'] = credit_debit_serializer.data
         paginated_response['items_per_page'] = records_per_page

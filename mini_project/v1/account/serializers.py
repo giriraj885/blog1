@@ -5,7 +5,8 @@ from mini_project_serializer import miniproject_base_serializer
 from v1.account.models import AccountManagement,BankDetails
 from services.firebase import fb_service
 from base import helper,constants
-from django.db.models import Q, Count, Case, When, Avg, Sum, IntegerField
+from django.db.models import Q, Count, Case, When, Avg, Sum, IntegerField,F
+from django.db.models.functions import Coalesce
 
 class ManageAccountSerializer(BaseSerializer):
     price = miniproject_base_serializer.IntegerField(required=True, error_messages={
@@ -147,48 +148,56 @@ class GetCreditDetailSerializer(BaseSerializer):
 
 
     def get_total_balance(self, accountmanagement):
-        account_list = AccountManagement.objects.filter(created_date_time__lte=accountmanagement.created_date_time)
+        total_credit_user_list = []
+        account_list = AccountManagement.objects.filter(
+            Q(credit_user=self.context['request_user'],debit_user__id=self.context['user']) |
+            Q(debit_user=self.context['request_user'],credit_user__id=self.context['user']),
+            created_date_time__lte=accountmanagement.created_date_time
+        )
+        # print(account_list)
         if 'user' in self.context and int(self.context['user']) == accountmanagement.debit_user.id:
             account_list = account_list.aggregate(
                 total_debit_user_price = Sum(
                     Case(
-                        When(debit_user=self.context['user'], then=accountmanagement.price),
+                        When(debit_user=self.context['user'], then=F('price')),
                         output_field=IntegerField(),
                         default=0
                         ),
                     ),
                 total_credit_user_price =  Sum(
                     Case(
-                        When(credit_user=self.context['user'], then=accountmanagement.price),
+                        When(credit_user=self.context['user'], then=F('price')),
                         output_field=IntegerField(),
                         default=0
                         ),
                     ), 
             )
-            total = account_list['total_credit_user_price'] + account_list['total_credit_user_price']
-            return account_list['total_credit_user_price'] - total - account_list['total_debit_user_price']
+            return account_list['total_debit_user_price']
           
             # return accountmanagement.price
         elif 'user' in self.context and int(self.context['user']) == accountmanagement.credit_user.id:
+            print('in else.....')
+            # account_list = account_list.filter(credit_user=self.context['user']).annotate(total_price=Coalesce(Sum('price'), 0))
             account_list = account_list.aggregate(
                 total_debit_user_price = Sum(
                     Case(
-                        When(debit_user=self.context['user'], then=accountmanagement.price),
+                        When(debit_user=self.context['user'], then=F('price')),
                         output_field=IntegerField(),
                         default=0
                         ),
                     ),
                 total_credit_user_price =  Sum(
                     Case(
-                        When(credit_user=self.context['user'], then=accountmanagement.price),
+                        When(credit_user=self.context['user'], then=F('price')),
                         output_field=IntegerField(),
                         default=0
                         ),
                     ), 
             )
-            total = account_list['total_credit_user_price'] + account_list['total_credit_user_price']
-            return account_list['total_credit_user_price'] - total
-        
+            if account_list['total_debit_user_price'] == 0:
+                return account_list['total_debit_user_price'] - account_list['total_credit_user_price']
+            else:
+                return account_list['total_credit_user_price'] - account_list['total_debit_user_price']
 
 class GetDebitDetailSerializer(BaseSerializer):
     credit = miniproject_base_serializer.SerializerMethodField()
