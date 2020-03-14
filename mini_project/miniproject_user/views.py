@@ -221,7 +221,7 @@ class ManageUser(BaseAPIView):
 
         user_list = User.objects.filter(
             ~Q(phone__in = phone_list)
-        ).order_by('-created_date_time')     
+        ).order_by('-updated_date_time')     
 
         if 'page_no' in request.GET and request.GET['page_no']!='0':
             page_end = int(request.GET['page_no']) * user_per_page
