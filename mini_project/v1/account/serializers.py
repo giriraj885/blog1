@@ -87,10 +87,11 @@ class GetCreditDetailSerializer(BaseSerializer):
     other_mobile_no = miniproject_base_serializer.SerializerMethodField()
     total_balance = miniproject_base_serializer.SerializerMethodField()
     credit_user_company_name = miniproject_base_serializer.SerializerMethodField()
+    total_opening_balance = miniproject_base_serializer.SerializerMethodField()
 
     class Meta:
         model = AccountManagement
-        fields = ('note','credit','debit','credit_user_id','created_date','total_balance','credit_user_company_name','other_user_id','other_business_name','other_business_address','other_business_photo','other_mobile_no')
+        fields = ('note','credit','debit','credit_user_id','created_date','total_balance','credit_user_company_name','other_user_id','other_business_name','other_business_address','other_business_photo','other_mobile_no','total_opening_balance')
 
     def get_credit_user_company_name(self, accountmanagement):
         if 'user' in self.context and int(self.context['user']) == accountmanagement.credit_user.id:
@@ -146,15 +147,45 @@ class GetCreditDetailSerializer(BaseSerializer):
     #     else:
     #         return ''
 
+    def get_total_opening_balance(self, accountmanagement):
+        print('in total opening balance...')
+        account_list = AccountManagement.objects.filter(
+            Q(credit_user=self.context['request_user'],debit_user__id=self.context['user']) |
+            Q(debit_user=self.context['request_user'],credit_user__id=self.context['user'])
+        ).filter(current_time__year__lt=self.context['current_year']).filter(current_time__month__lt=self.context['current_month'])
+
+        account_list = account_list.aggregate(
+            total_debit_user_price = Sum(
+                Case(
+                    When(debit_user=self.context['user'], then=F('price')),
+                    output_field=IntegerField(),
+                    default=0
+                    ),
+                ),
+            total_credit_user_price =  Sum(
+                Case(
+                    When(credit_user=self.context['user'], then=F('price')),
+                    output_field=IntegerField(),
+                    default=0
+                    ),
+                ), 
+        )
+        
+        if account_list['total_debit_user_price'] == None and account_list['total_credit_user_price'] == None:
+            return 0
+        else:
+            if account_list['total_debit_user_price'] == 0:
+                return account_list['total_debit_user_price'] - account_list['total_credit_user_price']
+            else:
+                return account_list['total_credit_user_price'] - account_list['total_debit_user_price']
 
     def get_total_balance(self, accountmanagement):
-        total_credit_user_list = []
         account_list = AccountManagement.objects.filter(
             Q(credit_user=self.context['request_user'],debit_user__id=self.context['user']) |
             Q(debit_user=self.context['request_user'],credit_user__id=self.context['user']),
             created_date_time__lte=accountmanagement.created_date_time
         )
-        # print(account_list)
+
         if 'user' in self.context and int(self.context['user']) == accountmanagement.debit_user.id:
             account_list = account_list.aggregate(
                 total_debit_user_price = Sum(
@@ -172,12 +203,8 @@ class GetCreditDetailSerializer(BaseSerializer):
                         ),
                     ), 
             )
-            return account_list['total_debit_user_price']
-          
-            # return accountmanagement.price
+            return account_list['total_debit_user_price'] - account_list['total_credit_user_price']
         elif 'user' in self.context and int(self.context['user']) == accountmanagement.credit_user.id:
-            print('in else.....')
-            # account_list = account_list.filter(credit_user=self.context['user']).annotate(total_price=Coalesce(Sum('price'), 0))
             account_list = account_list.aggregate(
                 total_debit_user_price = Sum(
                     Case(
