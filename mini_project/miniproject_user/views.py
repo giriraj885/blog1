@@ -221,7 +221,7 @@ class ManageUser(BaseAPIView):
 
         user_list = User.objects.filter(
             ~Q(phone__in = phone_list)
-        ).order_by('business_name')     
+        ).order_by('-business_name')     
 
         if 'page_no' in request.GET and request.GET['page_no']!='0':
             page_end = int(request.GET['page_no']) * user_per_page
@@ -325,17 +325,17 @@ class GetAllUser(BaseAPIView):
         credit_user_list = AccountManagement.objects.filter(
             Q(credit_user=request.user),
             ~Q(debit_user=request.user)
-        ).values_list('debit_user',flat=True).distinct('debit_user')
+        ).order_by('-updated_date_time').values_list('debit_user',flat=True).distinct('debit_user')
 
         debit_user_list = AccountManagement.objects.filter(
             ~Q(credit_user=request.user),
             Q(debit_user=request.user)
-        ).values_list('credit_user',flat=True).distinct('credit_user')
+        ).order_by('-updated_date_time').values_list('credit_user',flat=True).distinct('credit_user')
 
         user_list = User.objects.filter(
             Q(id__in = credit_user_list)|
             Q(id__in = debit_user_list)
-        ).order_by('-updated_date_time')
+        )
 
         if 'page_no' in request.GET and request.GET['page_no']!='0':
             page_end = int(request.GET['page_no']) * user_per_page
