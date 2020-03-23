@@ -14,6 +14,6 @@ gunicorn==19.7.1 # gunicorn
 firebase-admin==2.10.0
 oauth2==1.9.0.post1
 python-dateutil==2.7.3 # python datetime
-requests==2.18.4 # used to reading file from listhub
+requests==2.20.0 # used to reading file from listhub
 google-cloud-storage==1.8.0
 django-allauth==0.35.0 #authentication
