@@ -8,7 +8,7 @@ boto==2.48.0
 Markdown==2.6.11 # DRF documentation requirement dependency
 django-storages==1.6.5 # to upload files and documents
 Pillow==5.0.0 # Image field requires it.
-pycryptodome==3.4.11 # for encryption and decryption
+pycryptodome==3.6.6 # for encryption and decryption
 django-cors-headers==2.0.0
 gunicorn==19.7.1 # gunicorn
 firebase-admin==2.10.0
